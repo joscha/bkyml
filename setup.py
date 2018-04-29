@@ -16,7 +16,7 @@ entry_points = """
 [console_scripts]
 # script_name = bkyml.module:function
 # For example:
-# fibonacci = bkyml.skeleton:run
+bkyml = bkyml.skeleton:run
 """
 
 

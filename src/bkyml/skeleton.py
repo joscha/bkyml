@@ -29,7 +29,6 @@ __license__ = "mit"
 
 _logger = logging.getLogger(__name__)
 
-
 def fib(n):
     """Fibonacci example function
 
@@ -45,6 +44,12 @@ def fib(n):
         a, b = b, a+b
     return a
 
+def comment(ns):
+    lines = "\n# ".join(' '.join(ns.str).splitlines())
+    return f"# {lines}\n"
+
+def steps(ns):
+    return "steps:\n"
 
 def parse_args(args):
     """Parse command line parameters
@@ -56,16 +61,32 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Just a Fibonnaci demonstration")
+        description="Generate pipeline YAML for Buildkite")
+
+    subparsers = parser.add_subparsers(title='subcommands',
+                                       description='valid subcommands',
+                                       help='additional help')
+    parser_comment = subparsers.add_parser('comment')
+    parser_comment.add_argument(
+        dest="str",
+        help="Comment",
+        type=str,
+        nargs='+',
+        metavar="STRING")
+    parser_comment.set_defaults(func=comment)
+    parser_steps = subparsers.add_parser('steps')
+    parser_steps.set_defaults(func=steps)
     parser.add_argument(
         '--version',
         action='version',
         version='bkyml {ver}'.format(ver=__version__))
+    """
     parser.add_argument(
         dest="n",
         help="n-th Fibonacci number",
         type=int,
         metavar="INT")
+    """
     parser.add_argument(
         '-v',
         '--verbose',
@@ -102,8 +123,9 @@ def main(args):
     """
     args = parse_args(args)
     setup_logging(args.loglevel)
-    _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
+    print(args.func(args))
+    # _logger.debug("Starting crazy calculations...")
+    # print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
     _logger.info("Script ends here")
 
 

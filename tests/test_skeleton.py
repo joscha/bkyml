@@ -2,16 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from bkyml.skeleton import fib
+import argparse
+from bkyml.skeleton import comment, steps
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
+def test_comment(snapshot):
+    args = argparse.Namespace()
+    args.str = ['a', 'b']
 
-def test_fib():
-    assert fib(1) == 1
-    assert fib(2) == 1
-    assert fib(7) == 13
-    with pytest.raises(AssertionError):
-        fib(-10)
+    snapshot.assert_match(comment(args))
+
+def test_steps(snapshot):
+    args = argparse.Namespace()
+    snapshot.assert_match(steps(args))
