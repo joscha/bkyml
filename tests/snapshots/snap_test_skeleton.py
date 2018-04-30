@@ -12,3 +12,10 @@ snapshots['test_comment 1'] = '''# a b
 
 snapshots['test_steps 1'] = '''steps:
 '''
+
+snapshots['test_env 1'] = '''env:
+  a: b
+  c: d
+  e: f=g
+  j: ''
+'''

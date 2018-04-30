@@ -2,18 +2,48 @@
 bkyml
 =====
 
+A CLI tool to generate a `pipeline.yaml` file for Buildkite on the fly.
 
-Add a short description here!
 
-
-Description
+Sub-Commands
 ===========
 
-A longer description of your project goes here...
 
+## steps
 
-Note
-====
+Example:
+```sh
+bkyml steps
+```
 
-This project has been set up using PyScaffold 3.0.3. For details and usage
-information on PyScaffold see http://pyscaffold.org/.
+will produce
+```yaml
+steps:
+```
+
+## comment
+
+Example:
+```sh
+bkyml comment bla foo
+```
+
+will produce
+```yaml
+# bla foo
+```
+
+## env
+
+Example:
+```sh
+bkyml env var=vale voo=bla blubb=2=s
+```
+
+will produce
+```yaml
+env:
+  blubb: 2=s
+  var: vale
+  voo: bla
+```

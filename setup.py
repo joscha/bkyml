@@ -17,6 +17,7 @@ entry_points = """
 # script_name = bkyml.module:function
 # For example:
 bkyml = bkyml.skeleton:run
+bkyaml = bkyml.skeleton:run
 """
 
 
