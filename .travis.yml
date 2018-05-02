@@ -1,24 +1,11 @@
 sudo: false
 language: python
-virtualenv:
-  system_site_packages: true
-env:
-  matrix:
-    - DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="true"
-addons:
-  apt:
-    packages:
-      - git
-      - python-pip
+python:
+  - "3.6"
 install:
-  - source tests/travis_install.sh
+  - pip install coverage coveralls
   - pip install -r requirements.txt
-before_script:
-  - git config --global user.email "joscha@feth.com"
-  - git config --global user.name "Joscha Feth"
 script:
   - python setup.py test
 after_success:
-  - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
-cache:
-  - apt
+  - coveralls
