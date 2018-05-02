@@ -27,8 +27,21 @@ def env(ns):
     env_vars = {}
     for pair in pairs:
         if len(pair) == 2 and pair[0] != '':
-            env_vars[pair[0]] = pair[1] 
-    return yaml.dump({ 'env': env_vars }, default_flow_style=False)
+            env_vars[pair[0]] = pair[1]
+    if len(env_vars) == 0:
+        return None
+    else:
+        return yaml.dump({ 'env': env_vars }, default_flow_style=False)
+
+def command(ns):
+    command = sum(ns.command, [])
+    if len(command) == 1:
+        command = command[0]
+    step = {
+        'command':  command
+    }
+
+    return yaml.dump({ 'step': step }, default_flow_style=False)
 
 def parse_args(args):
     """Parse command line parameters
@@ -57,8 +70,20 @@ def parse_args(args):
     parser_steps.set_defaults(func=steps)
 
     parser_env = subparsers.add_parser('env')
-    parser_env.add_argument('env_pairs', nargs='+')
+    parser_env.add_argument(
+        'env_pairs',
+        help="set env vars via a=b",
+        nargs='+'
+    )
     parser_env.set_defaults(func=env)
+
+    parser_command = subparsers.add_parser('command')
+    parser_command.add_argument(
+        '--command',
+        nargs='+',
+        action='append',
+        required=True)
+    parser_command.set_defaults(func=command)
 
     parser.add_argument(
         '--version',
@@ -102,7 +127,9 @@ def main(args):
     setup_logging(args.loglevel)
     _logger.debug("Calling function")
     if hasattr(args, 'func'):
-        print(args.func(args))
+        ret = args.func(args)
+        if ret != None:
+            print(ret)
     _logger.info("Script ends here")
 
 

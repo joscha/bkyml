@@ -3,7 +3,7 @@
 
 import pytest
 import argparse
-from bkyml.skeleton import comment, steps, env
+from bkyml.skeleton import comment, steps, env, command
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -21,5 +21,20 @@ def test_steps(snapshot):
 
 def test_env(snapshot):
     ns = argparse.Namespace()
-    ns.env_pairs = [ 'a=b', 'c=d', 'e=f=g', 'h', '=i', 'j=']
+    ns.env_pairs = [ 'a=b', 'c=d', 'e=f=g', 'h', '=i', 'j=' ]
     snapshot.assert_match(env(ns))
+
+def test_env_empty(snapshot):
+    ns = argparse.Namespace()
+    ns.env_pairs = [ '', '' ]
+    snapshot.assert_match(env(ns))
+
+def test_command_1(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [[ "my-command arg1 'arg 2'" ]]
+    snapshot.assert_match(command(ns))
+
+def test_command_n(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'a', 'b' ], [ 'c', 'd' ] ]
+    snapshot.assert_match(command(ns))
