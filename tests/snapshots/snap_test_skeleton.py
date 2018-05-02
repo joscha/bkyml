@@ -7,11 +7,9 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_comment 1'] = '''# a b
-'''
+snapshots['test_comment 1'] = '# a b'
 
-snapshots['test_steps 1'] = '''steps:
-'''
+snapshots['test_steps 1'] = 'steps:'
 
 snapshots['test_env_empty 1'] = None
 
@@ -22,19 +20,16 @@ snapshots['test_env 1'] = '''env:
   j: ''
 '''
 
-snapshots['test_command_1 1'] = '''step:
-  command: my-command arg1 'arg 2'
+snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
 '''
 
-snapshots['test_command_n 1'] = '''step:
-  command:
-  - a
-  - b
-  - c
-  - d
+snapshots['test_command_n 1'] = '''  - command:
+      - a
+      - b
+      - c
+      - d
 '''
 
-snapshots['test_command_label 1'] = '''step:
-  command: a
-  label: My label
+snapshots['test_command_label 1'] = '''  - label: My label
+    command: a
 '''

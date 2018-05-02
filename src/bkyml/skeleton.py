@@ -31,10 +31,10 @@ yaml.default_flow_style = False
 
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
-    return f"# {lines}\n"
+    return f"# {lines}"
 
 def steps(ns):
-    return "steps:\n"
+    return "steps:"
 
 def env(ns):
     pairs = [ pair.split('=', 1) for pair in ns.env_pairs ]
@@ -48,16 +48,21 @@ def env(ns):
         return yaml.dump({ 'env': env_vars })
 
 def command(ns):
-    command = sum(ns.command, [])
-    if len(command) == 1:
-        command = command[0]
-    step = {
-        'command':  command
-    }
+    step = {}
+
+    # label
     if hasattr(ns, 'label'):
         step['label'] = ns.label
 
-    return yaml.dump({ 'step': step })
+    # command
+    command = sum(ns.command, [])
+    if len(command) == 1:
+        command = command[0]
+    step['command'] = command
+
+
+    yaml.indent(sequence=4, offset=2)
+    return yaml.dump([ step ])
 
 def parse_args(args):
     """Parse command line parameters
