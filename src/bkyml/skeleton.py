@@ -5,7 +5,7 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import sys
 import logging
-import yaml
+from ruamel.yaml import dump
 
 from bkyml import __version__
 
@@ -31,7 +31,7 @@ def env(ns):
     if len(env_vars) == 0:
         return None
     else:
-        return yaml.dump({ 'env': env_vars }, default_flow_style=False)
+        return dump({ 'env': env_vars }, default_flow_style=False)
 
 def command(ns):
     command = sum(ns.command, [])
@@ -40,8 +40,10 @@ def command(ns):
     step = {
         'command':  command
     }
+    if ns.label != None:
+        step['label'] = ns.label
 
-    return yaml.dump({ 'step': step }, default_flow_style=False)
+    return dump({ 'step': step }, default_flow_style=False)
 
 def parse_args(args):
     """Parse command line parameters
@@ -80,9 +82,15 @@ def parse_args(args):
     parser_command = subparsers.add_parser('command')
     parser_command.add_argument(
         '--command',
+        help="The shell command/s to run during this step.",
         nargs='+',
         action='append',
         required=True)
+    parser_command.add_argument(
+        '--label',
+        help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
+        type=str,
+        metavar="STRING")
     parser_command.set_defaults(func=command)
 
     parser.add_argument(
