@@ -163,7 +163,6 @@ def main(args):
         print(ret)
     _logger.info("Script ends here")
 
-
 def run():
     """Entry point for console_scripts
     """

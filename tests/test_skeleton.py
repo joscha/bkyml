@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import pytest
 import argparse
-from bkyml.skeleton import comment, steps, env, command, parse_main
+from unittest.mock import patch
+from bkyml.skeleton import comment, steps, env, command, parse_main, run
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -47,3 +49,8 @@ def test_command_label(snapshot):
 
 def test_cli(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
+
+def test_run():
+    testargs = ["--help"]
+    with patch.object(sys, 'argv', testargs):
+        run()
