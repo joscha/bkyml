@@ -13,14 +13,14 @@ snapshots['test_comment 1'] = '''# a b
 snapshots['test_steps 1'] = '''steps:
 '''
 
+snapshots['test_env_empty 1'] = None
+
 snapshots['test_env 1'] = '''env:
   a: b
   c: d
   e: f=g
   j: ''
 '''
-
-snapshots['test_env_empty 1'] = None
 
 snapshots['test_command_1 1'] = '''step:
   command: my-command arg1 'arg 2'
@@ -32,4 +32,9 @@ snapshots['test_command_n 1'] = '''step:
   - b
   - c
   - d
+'''
+
+snapshots['test_command_label 1'] = '''step:
+  command: a
+  label: My label
 '''

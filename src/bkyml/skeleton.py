@@ -5,7 +5,8 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import sys
 import logging
-from ruamel.yaml import dump
+from ruamel.yaml import YAML
+from ruamel.yaml.compat import StringIO
 
 from bkyml import __version__
 
@@ -14,6 +15,19 @@ __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
 _logger = logging.getLogger(__name__)
+
+class MyYAML(YAML):
+    def dump(self, data, stream=None, **kw):
+        inefficient = False
+        if stream is None:
+            inefficient = True
+            stream = StringIO()
+        YAML.dump(self, data, stream, **kw)
+        if inefficient:
+            return stream.getvalue()
+
+yaml = MyYAML()
+yaml.default_flow_style = False
 
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
@@ -31,7 +45,7 @@ def env(ns):
     if len(env_vars) == 0:
         return None
     else:
-        return dump({ 'env': env_vars }, default_flow_style=False)
+        return yaml.dump({ 'env': env_vars })
 
 def command(ns):
     command = sum(ns.command, [])
@@ -40,10 +54,10 @@ def command(ns):
     step = {
         'command':  command
     }
-    if ns.label != None:
+    if hasattr(ns, 'label'):
         step['label'] = ns.label
 
-    return dump({ 'step': step }, default_flow_style=False)
+    return yaml.dump({ 'step': step })
 
 def parse_args(args):
     """Parse command line parameters

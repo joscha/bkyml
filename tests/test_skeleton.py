@@ -38,3 +38,9 @@ def test_command_n(snapshot):
     ns = argparse.Namespace()
     ns.command = [ [ 'a', 'b' ], [ 'c', 'd' ] ]
     snapshot.assert_match(command(ns))
+
+def test_command_label(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'a'] ]
+    ns.label = 'My label'
+    snapshot.assert_match(command(ns))
