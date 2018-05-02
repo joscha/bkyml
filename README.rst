@@ -5,45 +5,81 @@ bkyml
 A CLI tool to generate a `pipeline.yaml` file for Buildkite on the fly.
 
 
+Example:
+
+.. code:: shell
+
+  bkyaml comment 'Frontend tests pipeline'
+  bkyaml env FORCE_COLOR=1
+  bkyaml steps
+  bkyml command \
+    --command 'yarn install' \
+    --command 'yarn test' \
+    --label ':karma: tests'
+
+will produce
+
+.. code:: yaml
+
+  # Frontend tests pipeline
+  env:
+    FORCE_COLOR: 1
+  steps:
+    - label: ':karma: tests'
+      command:
+        - yarn install
+        - yarn test
+
+
 Sub-Commands
-===========
+============
 
 
-## steps
-
-Example:
-```sh
-bkyml steps
-```
-
-will produce
-```yaml
-steps:
-```
-
-## comment
+steps
+-----
 
 Example:
-```sh
-bkyml comment bla foo
-```
+
+.. code:: shell
+
+  bkyml steps
 
 will produce
-```yaml
-# bla foo
-```
 
-## env
+.. code:: yaml
+
+  steps:
+
+comment
+-------
 
 Example:
-```sh
-bkyml env var=vale voo=bla blubb=2=s
-```
+
+.. code:: shell
+
+  bkyml comment bla foo
 
 will produce
-```yaml
-env:
-  blubb: 2=s
-  var: vale
-  voo: bla
-```
+
+.. code:: yaml
+
+  # bla foo
+
+
+env
+---
+
+Example:
+
+.. code:: shell
+
+  bkyaml env FORCE_COLOR=1 A B=2=
+
+will produce
+
+.. code:: yaml
+
+  env:
+    FORCE_COLOR: 1
+    A: ''
+    B: 2=
