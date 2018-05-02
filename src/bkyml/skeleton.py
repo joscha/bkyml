@@ -143,6 +143,13 @@ def setup_logging(loglevel):
     logging.basicConfig(level=loglevel, stream=sys.stdout,
                         format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
+def parse_main(args):
+    args = parse_args(args)
+    setup_logging(args.loglevel)
+    if hasattr(args, 'func'):
+        return args.func(args)
+    else:
+        return None
 
 def main(args):
     """Main entry point allowing external calls
@@ -150,13 +157,10 @@ def main(args):
     Args:
       args ([str]): command line parameter list
     """
-    args = parse_args(args)
-    setup_logging(args.loglevel)
+    ret = parse_main(args)
     _logger.debug("Calling function")
-    if hasattr(args, 'func'):
-        ret = args.func(args)
-        if ret != None:
-            print(ret)
+    if ret != None:
+        print(ret)
     _logger.info("Script ends here")
 
 

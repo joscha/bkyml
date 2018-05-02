@@ -33,3 +33,7 @@ snapshots['test_command_n 1'] = '''  - command:
 snapshots['test_command_label 1'] = '''  - label: My label
     command: a
 '''
+
+snapshots['test_cli 1'] = '''  - label:
+    command: x
+'''

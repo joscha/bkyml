@@ -3,7 +3,7 @@
 
 import pytest
 import argparse
-from bkyml.skeleton import comment, steps, env, command
+from bkyml.skeleton import comment, steps, env, command, parse_main
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -44,3 +44,6 @@ def test_command_label(snapshot):
     ns.command = [ [ 'a'] ]
     ns.label = 'My label'
     snapshot.assert_match(command(ns))
+
+def test_cli(snapshot):
+    snapshot.assert_match(parse_main(['command', '--command', 'x']))
