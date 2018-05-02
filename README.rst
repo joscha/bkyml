@@ -3,6 +3,9 @@ bkyml
 =====
 .. image:: https://travis-ci.org/joscha/bkyml.svg?branch=master
     :target: https://travis-ci.org/joscha/bkyml
+    
+.. image:: https://coveralls.io/repos/github/joscha/bkyml/badge.svg?branch=master
+    :target: https://coveralls.io/github/joscha/bkyml?branch=master
 
 A CLI tool to generate a `pipeline.yaml` file for Buildkite on the fly.
 
