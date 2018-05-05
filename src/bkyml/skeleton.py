@@ -32,13 +32,11 @@ yaml.default_flow_style = False
 def ns_hasattr(ns, attr):
     return hasattr(ns, attr) and getattr(ns, attr) != None
 
-def parse_env_pairs(env_pairs):
-    pairs = [ pair.split('=', 1) for pair in env_pairs ]
-    env_vars = {}
-    for pair in pairs:
-        if len(pair) == 2 and pair[0] != '':
-            env_vars[pair[0]] = pair[1]
-    return env_vars
+def tuples_to_dict(tuples):
+    ret = {}
+    for tuple in tuples:
+        ret[tuple[0]] = tuple[1]
+    return ret
 
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
@@ -48,11 +46,7 @@ def steps(ns):
     return "steps:"
 
 def env(ns):
-    env_vars = parse_env_pairs(ns.env_pairs)
-    if len(env_vars) == 0:
-        return None
-    else:
-        return yaml.dump({ 'env': env_vars })
+    return yaml.dump({ 'env': tuples_to_dict(ns.var) })
 
 def command(ns):
     step = {}
@@ -72,9 +66,10 @@ def command(ns):
         step['branches'] = ' '.join(ns.branches)
 
     if ns_hasattr(ns, 'env'):
-        env_vars = parse_env_pairs(ns.env)
-        if len(env_vars) > 0:
-            step['env'] = env_vars
+        step['env'] = tuples_to_dict(ns.env)
+
+    if ns_hasattr(ns, 'agents'):
+        step['agents'] = tuples_to_dict(ns.agents)
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -100,16 +95,20 @@ def parse_args(args):
         help="Comment",
         type=str,
         nargs='+',
-        metavar="STRING")
+        metavar="COMMENT")
     parser_comment.set_defaults(func=comment)
     parser_steps = subparsers.add_parser('steps')
     parser_steps.set_defaults(func=steps)
 
     parser_env = subparsers.add_parser('env')
     parser_env.add_argument(
-        'env_pairs',
-        help="set env vars via a=b",
-        nargs='+'
+        '--var',
+        help="A map of environment variables for this pipeline.",
+        type=str,
+        nargs=2,
+        action='append',
+        metavar=('KEY', 'VALUE'),
+        required=True
     )
     parser_env.set_defaults(func=env)
 
@@ -120,26 +119,36 @@ def parse_args(args):
         nargs='+',
         action='append',
         type=str,
-        metavar="STRING",
+        metavar="COMMAND",
         required=True)
     parser_command.add_argument(
         '--label',
         help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
         type=str,
-        metavar="STRING")
+        metavar="LABEL")
     parser_command.add_argument(
         '--branches',
         help="The branch pattern defining which branches will include this step in their builds.",
         type=str,
-        nargs='*',
-        metavar="STRING"
+        nargs='+',
+        metavar="BRANCH_PATTERN"
     )
     parser_command.add_argument(
         '--env',
-        help="A map of environment variables for this step. Set via a=b.",
+        help="A map of environment variables for this step.",
         type=str,
-        nargs='*',
-        metavar="ENV_PAIR"
+        nargs=2,
+        action='append',
+        metavar=('KEY', 'VALUE')
+    )
+
+    parser_command.add_argument(
+        '--agents',
+        help="A map of meta-data keys to values to target specific agents for this step.",
+        type=str,
+        nargs=2,
+        action='append',
+        metavar=('KEY', 'VALUE')
     )
 
     parser_command.set_defaults(func=command)

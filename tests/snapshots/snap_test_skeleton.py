@@ -11,15 +11,6 @@ snapshots['test_comment 1'] = '# a b'
 
 snapshots['test_steps 1'] = 'steps:'
 
-snapshots['test_env_empty 1'] = None
-
-snapshots['test_env 1'] = '''env:
-  a: b
-  c: d
-  e: f=g
-  j: ''
-'''
-
 snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
 '''
 
@@ -45,6 +36,15 @@ snapshots['test_command_env 1'] = '''  - command: cmd
     env:
       a: b
       c: d
-      e: f=g
-      j: ''
+'''
+
+snapshots['test_env 1'] = '''env:
+  a: b
+  c: d
+'''
+
+snapshots['test_command_agents 1'] = '''  - command: cmd
+    agents:
+      npm: 'true'
+      mvn: 'true'
 '''

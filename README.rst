@@ -78,16 +78,15 @@ Example:
 
 .. code:: shell
 
-  bkyaml env FORCE_COLOR=1 A B=2=
+  bkyaml env --var A B --var C D
 
 will produce
 
 .. code:: yaml
 
   env:
-    FORCE_COLOR: 1
-    A: ''
-    B: 2=
+    A: B
+    C: D
 
 command
 -------
@@ -99,9 +98,10 @@ Example:
   bkyaml command \
       --command 'yarn install' \
       --command 'yarn test' \
-      --env FORCE_COLOR=1 \
+      --env FORCE_COLOR 1 \
       --branches master \
-      --label ':yarn: tests'
+      --label ':yarn: tests' \
+      --agents yarn true
 
 will produce
 
@@ -114,3 +114,5 @@ will produce
     branches: master
     env:
       FORCE_COLOR: '1'
+    agents:
+      yarn: 'true'

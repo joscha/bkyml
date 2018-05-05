@@ -22,12 +22,7 @@ def test_steps(snapshot):
 
 def test_env(snapshot):
     ns = argparse.Namespace()
-    ns.env_pairs = [ 'a=b', 'c=d', 'e=f=g', 'h', '=i', 'j=' ]
-    snapshot.assert_match(env(ns))
-
-def test_env_empty(snapshot):
-    ns = argparse.Namespace()
-    ns.env_pairs = [ '', '' ]
+    ns.var = [ ['a', 'b'], ['c', 'd'] ]
     snapshot.assert_match(env(ns))
 
 def test_command_1(snapshot):
@@ -55,7 +50,13 @@ def test_command_branches(snapshot):
 def test_command_env(snapshot):
     ns = argparse.Namespace()
     ns.command = [ [ 'cmd' ] ]
-    ns.env = [ 'a=b', 'c=d', 'e=f=g', 'h', '=i', 'j=' ]
+    ns.env = [ ['a', 'b'], ['c', 'd'] ]
+    snapshot.assert_match(command(ns))
+
+def test_command_agents(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.agents = [ ['npm', 'true'], ['mvn', 'true'] ]
     snapshot.assert_match(command(ns))
 
 def test_parse_main(snapshot):
