@@ -32,6 +32,14 @@ yaml.default_flow_style = False
 def ns_hasattr(ns, attr):
     return hasattr(ns, attr) and getattr(ns, attr) != None
 
+def parse_env_pairs(env_pairs):
+    pairs = [ pair.split('=', 1) for pair in env_pairs ]
+    env_vars = {}
+    for pair in pairs:
+        if len(pair) == 2 and pair[0] != '':
+            env_vars[pair[0]] = pair[1]
+    return env_vars
+
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
     return f"# {lines}"
@@ -40,11 +48,7 @@ def steps(ns):
     return "steps:"
 
 def env(ns):
-    pairs = [ pair.split('=', 1) for pair in ns.env_pairs ]
-    env_vars = {}
-    for pair in pairs:
-        if len(pair) == 2 and pair[0] != '':
-            env_vars[pair[0]] = pair[1]
+    env_vars = parse_env_pairs(ns.env_pairs)
     if len(env_vars) == 0:
         return None
     else:
@@ -66,6 +70,11 @@ def command(ns):
 
     if ns_hasattr(ns, 'branches'):
         step['branches'] = ' '.join(ns.branches)
+
+    if ns_hasattr(ns, 'env'):
+        env_vars = parse_env_pairs(ns.env)
+        if len(env_vars) > 0:
+            step['env'] = env_vars
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -125,6 +134,14 @@ def parse_args(args):
         nargs='*',
         metavar="STRING"
     )
+    parser_command.add_argument(
+        '--env',
+        help="A map of environment variables for this step. Set via a=b.",
+        type=str,
+        nargs='*',
+        metavar="ENV_PAIR"
+    )
+
     parser_command.set_defaults(func=command)
 
     parser.add_argument(

@@ -31,12 +31,20 @@ snapshots['test_command_n 1'] = '''  - command:
 '''
 
 snapshots['test_command_label 1'] = '''  - label: My label
-    command: a
+    command: cmd
 '''
 
-snapshots['test_command_branches 1'] = '''  - command: a
+snapshots['test_command_branches 1'] = '''  - command: cmd
     branches: master release-*
 '''
 
 snapshots['test_parse_main 1'] = '''  - command: x
+'''
+
+snapshots['test_command_env 1'] = '''  - command: cmd
+    env:
+      a: b
+      c: d
+      e: f=g
+      j: ''
 '''

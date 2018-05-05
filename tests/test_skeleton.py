@@ -42,14 +42,20 @@ def test_command_n(snapshot):
 
 def test_command_label(snapshot):
     ns = argparse.Namespace()
-    ns.command = [ [ 'a'] ]
+    ns.command = [ [ 'cmd' ] ]
     ns.label = 'My label'
     snapshot.assert_match(command(ns))
 
 def test_command_branches(snapshot):
     ns = argparse.Namespace()
-    ns.command = [ [ 'a']]
+    ns.command = [ [ 'cmd' ] ]
     ns.branches = [ 'master', 'release-*' ]
+    snapshot.assert_match(command(ns))
+
+def test_command_env(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.env = [ 'a=b', 'c=d', 'e=f=g', 'h', '=i', 'j=' ]
     snapshot.assert_match(command(ns))
 
 def test_parse_main(snapshot):

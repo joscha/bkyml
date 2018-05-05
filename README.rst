@@ -88,3 +88,29 @@ will produce
     FORCE_COLOR: 1
     A: ''
     B: 2=
+
+command
+-------
+
+Example:
+
+..code:: shell
+
+  bkyaml command \
+      --command 'yarn install' \
+      --command 'yarn test' \
+      --env FORCE_COLOR=1 \
+      --branches master \
+      --label ':yarn: tests'
+
+will produce
+
+.. code:: yaml
+
+  - label: ':yarn: tests'
+    command:
+      - yarn install
+      - yarn test
+    branches: master
+    env:
+      FORCE_COLOR: '1'
