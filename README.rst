@@ -120,7 +120,9 @@ Example:
       --label ':yarn: tests' \
       --agents yarn true \
       --artifact-paths 'logs/**/*' 'coverage/**/*' \
-      --parallelism 5
+      --parallelism 5 \
+      --concurrency 2 \
+      --concurrency-group my/group
 
 
 will produce
@@ -140,3 +142,5 @@ will produce
       - logs/**/*
       - coverage/**/*
     parallelism: 5
+    concurrency: 2
+    concurrency_group: my/group

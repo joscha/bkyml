@@ -36,7 +36,7 @@ def check_positive(value):
     return ivalue
 
 def ns_hasattr(ns, attr):
-    return hasattr(ns, attr) and getattr(ns, attr) != None
+    return hasattr(ns, attr) and getattr(ns, attr) is not None
 
 def tuples_to_dict(tuples):
     ret = {}
@@ -92,6 +92,11 @@ def command(ns):
     # parallelism
     if ns_hasattr(ns, 'parallelism') and ns.parallelism > 1:
         step['parallelism'] = ns.parallelism
+
+    # concurrency and concurrency_group
+    if ns_hasattr(ns, 'concurrency') and ns_hasattr(ns, 'concurrency_group'):
+        step['concurrency'] = ns.concurrency
+        step['concurrency_group'] = ns.concurrency_group
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -181,9 +186,21 @@ def parse_args(args):
     )
     parser_command.add_argument(
         '--parallelism',
-        help="The number of parallel jobs that will be created based on this step. ",
+        help="The number of parallel jobs that will be created based on this step.",
         type=check_positive,
         metavar="POSITIVE_NUMBER"
+    )
+    parser_command.add_argument(
+        '--concurrency',
+        help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.",
+        type=check_positive,
+        metavar="POSITIVE_NUMBER"
+    )
+    parser_command.add_argument(
+        '--concurrency-group',
+        help="A unique name for the concurrency group that you are creating with the concurrency attribute.",
+        type=str,
+        metavar="GROUP_NAME"
     )
 
     parser_command.set_defaults(func=command)
@@ -206,8 +223,11 @@ def parse_args(args):
         help="set loglevel to DEBUG",
         action='store_const',
         const=logging.DEBUG)
-    return parser.parse_args(args)
 
+    parsed = parser.parse_args(args)
+    if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
+        parser.error("--concurrency requires --concurrency-group.")
+    return parsed
 
 def setup_logging(loglevel):
     """Setup basic logging
@@ -221,6 +241,7 @@ def setup_logging(loglevel):
 
 def parse_main(args):
     args = parse_args(args)
+
     setup_logging(args.loglevel)
     if hasattr(args, 'func'):
         return args.func(args)

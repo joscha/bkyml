@@ -46,9 +46,6 @@ snapshots['test_command_agents 1'] = '''  - command: cmd
       mvn: 'true'
 '''
 
-snapshots['test_parse_main 1'] = '''  - command: x
-'''
-
 snapshots['test_command_artifact_paths_1 1'] = '''  - command: cmd
     artifact_paths: logs/**/*;coverage/**/*
 '''
@@ -64,4 +61,12 @@ snapshots['test_command_parallelism 1'] = '''  - command: cmd
 '''
 
 snapshots['test_command_parallelism_1 1'] = '''  - command: cmd
+'''
+
+snapshots['test_command_concurrency 1'] = '''  - command: cmd
+    concurrency: 2
+    concurrency_group: my/group
+'''
+
+snapshots['test_parse_main 1'] = '''  - command: x
 '''

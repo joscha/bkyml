@@ -83,6 +83,13 @@ def test_command_parallelism_1(snapshot):
     ns.parallelism = 1
     snapshot.assert_match(command(ns))
 
+def test_command_concurrency(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.concurrency = 2
+    ns.concurrency_group = 'my/group'
+    snapshot.assert_match(command(ns))
+
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
