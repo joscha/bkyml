@@ -31,6 +31,14 @@ def check_positive(value):
          raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
     return ivalue
 
+def bool_or_string(value):
+    if value.lower() is 'true':
+        return True
+    elif value.lower() is 'false':
+        return False
+    else:
+        return value
+
 def ns_hasattr(ns, attr):
     return hasattr(ns, attr) and getattr(ns, attr) is not None
 
@@ -164,6 +172,12 @@ class Command:
             type=int,
             metavar="TIMEOUT"
         )
+        parser.add_argument(
+            '--skip',
+            help="Whether to skip this step or not.",
+            type=bool_or_string,
+            metavar="BOOL_OR_STRING"
+        )
 
         parser.set_defaults(func=Command.command)
 
@@ -219,6 +233,9 @@ class Command:
         # timeout_in_minutes
         if ns_hasattr(ns, 'timeout_in_minutes') and ns.timeout_in_minutes > 0:
             step['timeout_in_minutes'] = ns.timeout_in_minutes
+
+        if ns_hasattr(ns, 'skip') and (ns.skip is True or type(ns.skip) is str):
+            step['skip'] = ns.skip
 
         yaml.indent(sequence=4, offset=2)
         return yaml.dump([ step ])

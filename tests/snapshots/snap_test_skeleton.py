@@ -9,59 +9,7 @@ snapshots = Snapshot()
 
 snapshots['test_steps 1'] = 'steps:'
 
-snapshots['test_env 1'] = '''  - command: cmd
-    env:
-      a: b
-      c: d
-'''
-
-snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
-'''
-
-snapshots['test_command_n 1'] = '''  - command:
-      - a
-      - b
-      - c
-      - d
-'''
-
 snapshots['test_comment 1'] = '# a b'
-
-snapshots['test_label 1'] = '''  - label: My label
-    command: cmd
-'''
-
-snapshots['test_branches 1'] = '''  - command: cmd
-    branches: master release-*
-'''
-
-snapshots['test_agents 1'] = '''  - command: cmd
-    agents:
-      npm: 'true'
-      mvn: 'true'
-'''
-
-snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
-    artifact_paths: logs/**/*;coverage/**/*
-'''
-
-snapshots['test_artifact_paths_n 1'] = '''  - command: cmd
-    artifact_paths:
-      - logs/**/*
-      - coverage/**/*
-'''
-
-snapshots['test_parallelism 1'] = '''  - command: cmd
-    parallelism: 4
-'''
-
-snapshots['test_parallelism_1 1'] = '''  - command: cmd
-'''
-
-snapshots['test_concurrency 1'] = '''  - command: cmd
-    concurrency: 2
-    concurrency_group: my/group
-'''
 
 snapshots['test_main 1'] = '''  - command: x
 '''
@@ -101,7 +49,7 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--parallelism POSITIVE_NUMBER]
                 [--concurrency POSITIVE_NUMBER]
                 [--concurrency-group GROUP_NAME]
-                [--timeout-in-minutes TIMEOUT]
+                [--timeout-in-minutes TIMEOUT] [--skip BOOL_OR_STRING]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -133,11 +81,76 @@ optional arguments:
                         allowed to run. If the job does not finish within this
                         limit, it will be automatically cancelled and the
                         build will fail.
+  --skip BOOL_OR_STRING
+                        Whether to skip this step or not.
 '''
 
 snapshots['test_env_all 1'] = '''env:
   a: b
   c: d
+'''
+
+snapshots['test_skip_bool_true 1'] = '''  - command: cmd
+    skip: true
+'''
+
+snapshots['test_skip_bool_false 1'] = '''  - command: cmd
+'''
+
+snapshots['test_skip_string 1'] = '''  - command: cmd
+    skip: Some reason
+'''
+
+snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
+'''
+
+snapshots['test_command_n 1'] = '''  - command:
+      - a
+      - b
+      - c
+      - d
+'''
+
+snapshots['test_label 1'] = '''  - label: My label
+    command: cmd
+'''
+
+snapshots['test_branches 1'] = '''  - command: cmd
+    branches: master release-*
+'''
+
+snapshots['test_env 1'] = '''  - command: cmd
+    env:
+      a: b
+      c: d
+'''
+
+snapshots['test_agents 1'] = '''  - command: cmd
+    agents:
+      npm: 'true'
+      mvn: 'true'
+'''
+
+snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
+    artifact_paths: logs/**/*;coverage/**/*
+'''
+
+snapshots['test_artifact_paths_n 1'] = '''  - command: cmd
+    artifact_paths:
+      - logs/**/*
+      - coverage/**/*
+'''
+
+snapshots['test_parallelism 1'] = '''  - command: cmd
+    parallelism: 4
+'''
+
+snapshots['test_parallelism_1 1'] = '''  - command: cmd
+'''
+
+snapshots['test_concurrency 1'] = '''  - command: cmd
+    concurrency: 2
+    concurrency_group: my/group
 '''
 
 snapshots['test_timeout_in_minutes_minus 1'] = '''  - command: cmd

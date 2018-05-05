@@ -128,6 +128,24 @@ def describe_command():
         ns.timeout_in_minutes = 1
         snapshot.assert_match(Command.command(ns))
 
+    def test_skip_bool_true(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.skip = True
+        snapshot.assert_match(Command.command(ns))
+
+    def test_skip_bool_false(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.skip = False
+        snapshot.assert_match(Command.command(ns))
+
+    def test_skip_string(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.skip = 'Some reason'
+        snapshot.assert_match(Command.command(ns))
+
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))
