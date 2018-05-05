@@ -177,6 +177,7 @@ class Command:
         # command (required)
         assert ns_hasattr(ns, 'command')
         command = sum(ns.command, [])
+        assert len(command) > 0
         step['command'] = singlify(command)
 
         # branches
@@ -194,14 +195,18 @@ class Command:
         # artifact_paths
         if ns_hasattr(ns, 'artifact_paths'):
             artifact_paths = sum(ns.artifact_paths, [])
-            step['artifact_paths'] = singlify(artifact_paths)
+            if len(artifact_paths) > 0:
+                step['artifact_paths'] = singlify(artifact_paths)
 
         # parallelism
-        if ns_hasattr(ns, 'parallelism') and ns.parallelism > 1:
-            step['parallelism'] = ns.parallelism
+        if ns_hasattr(ns, 'parallelism'):
+            assert check_positive(ns.parallelism)
+            if ns.parallelism > 1:
+                step['parallelism'] = ns.parallelism
 
         # concurrency and concurrency_group
         if ns_hasattr(ns, 'concurrency') and ns_hasattr(ns, 'concurrency_group'):
+            assert check_positive(ns.concurrency)
             step['concurrency'] = ns.concurrency
             step['concurrency_group'] = ns.concurrency_group
 
