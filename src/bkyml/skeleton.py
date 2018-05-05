@@ -252,7 +252,7 @@ def main(args):
     """
     ret = parse_main(args)
     _logger.debug("Calling function")
-    if ret != None:
+    if ret is not None:
         print(ret)
     _logger.info("Script ends here")
 

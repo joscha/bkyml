@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import io
 import sys
 import pytest
 import argparse
 from unittest.mock import patch
-from bkyml.skeleton import comment, steps, env, command, parse_main, run
-from contextlib import redirect_stdout
+from bkyml.skeleton import comment, steps, env, command, parse_main, run, check_positive, parse_args
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
+
+def test_check_positive_1():
+    assert check_positive(1) == True
+
+def test_check_positive_minus_1():
+    with pytest.raises(argparse.ArgumentTypeError) as err:
+        check_positive(-1)
+    assert '-1 is an invalid positive int value' in str(err.value)
 
 def test_comment(snapshot):
     ns = argparse.Namespace()
@@ -92,18 +98,26 @@ def test_command_concurrency(snapshot):
     ns.concurrency_group = 'my/group'
     snapshot.assert_match(command(ns))
 
+def test_command_concurrency_cli(capsys):
+    with pytest.raises(SystemExit) as sys_exit:
+        parse_main(['command', '--command', 'x', '--concurrency', '1'])
+    assert '2' in str(sys_exit.value)
+    captured = capsys.readouterr()
+    assert '--concurrency requires --concurrency-group' in captured.err
+
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
-def test_cli(snapshot):
+def test_cli_command(snapshot, capsys):
+    with patch.object(sys, 'argv', ['', 'command', '--command', 'x']):
+        run()
+    captured = capsys.readouterr()
+    snapshot.assert_match(captured.out)
+
+def test_cli_help(snapshot, capsys):
     for subcommand in ['comment', 'steps', 'env', 'command']:
-        with patch.object(sys, 'argv', ['', subcommand, '--help']):
-            try:
-                f = io.StringIO()
-                with redirect_stdout(f):
-                    run()
-                    out = f.getvalue()
-                    snapshot.assert_match(out)
-            except SystemExit:
-                out = f.getvalue()
-                snapshot.assert_match(out)
+        with pytest.raises(SystemExit):
+            with patch.object(sys, 'argv', ['', subcommand, '--help']):
+                run()
+        captured = capsys.readouterr()
+        snapshot.assert_match(captured.out)

@@ -71,7 +71,11 @@ snapshots['test_command_concurrency 1'] = '''  - command: cmd
 snapshots['test_parse_main 1'] = '''  - command: x
 '''
 
-snapshots['test_cli 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
+snapshots['test_cli_command 1'] = '''  - command: x
+
+'''
+
+snapshots['test_cli_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
 
 positional arguments:
   COMMENT     Comment
@@ -80,20 +84,20 @@ optional arguments:
   -h, --help  show this help message and exit
 '''
 
-snapshots['test_cli 2'] = '''usage:  steps [-h]
+snapshots['test_cli_help 2'] = '''usage:  steps [-h]
 
 optional arguments:
   -h, --help  show this help message and exit
 '''
 
-snapshots['test_cli 3'] = '''usage:  env [-h] --var KEY VALUE
+snapshots['test_cli_help 3'] = '''usage:  env [-h] --var KEY VALUE
 
 optional arguments:
   -h, --help       show this help message and exit
   --var KEY VALUE  A map of environment variables for this pipeline.
 '''
 
-snapshots['test_cli 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ...] [--label LABEL]
+snapshots['test_cli_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ...] [--label LABEL]
                 [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
                 [--env KEY VALUE] [--agents KEY VALUE]
                 [--artifact-paths GLOB_OR_PATH [GLOB_OR_PATH ...]]
