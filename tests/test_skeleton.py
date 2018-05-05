@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 import sys
 import pytest
 import argparse
 from unittest.mock import patch
 from bkyml.skeleton import comment, steps, env, command, parse_main, run
+from contextlib import redirect_stdout
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -93,10 +95,15 @@ def test_command_concurrency(snapshot):
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
-def test_cli():
-    with patch.object(sys, 'argv', ['--help']):
-        run()
-
-#def test_cli_commands(snapshot):
-#    for subcommand in ['comment', 'steps', 'env', 'command']:
-#        snapshot.assert_match(parse_main([subcommand, '--help']))
+def test_cli(snapshot):
+    for subcommand in ['comment', 'steps', 'env', 'command']:
+        with patch.object(sys, 'argv', ['', subcommand, '--help']):
+            try:
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    run()
+                    out = f.getvalue()
+                    snapshot.assert_match(out)
+            except SystemExit:
+                out = f.getvalue()
+                snapshot.assert_match(out)
