@@ -7,13 +7,12 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_comment 1'] = '# a b'
-
 snapshots['test_steps 1'] = 'steps:'
 
-snapshots['test_env 1'] = '''env:
-  a: b
-  c: d
+snapshots['test_env 1'] = '''  - command: cmd
+    env:
+      a: b
+      c: d
 '''
 
 snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
@@ -26,56 +25,54 @@ snapshots['test_command_n 1'] = '''  - command:
       - d
 '''
 
-snapshots['test_command_label 1'] = '''  - label: My label
+snapshots['test_comment 1'] = '# a b'
+
+snapshots['test_label 1'] = '''  - label: My label
     command: cmd
 '''
 
-snapshots['test_command_branches 1'] = '''  - command: cmd
+snapshots['test_branches 1'] = '''  - command: cmd
     branches: master release-*
 '''
 
-snapshots['test_command_env 1'] = '''  - command: cmd
-    env:
-      a: b
-      c: d
-'''
-
-snapshots['test_command_agents 1'] = '''  - command: cmd
+snapshots['test_agents 1'] = '''  - command: cmd
     agents:
       npm: 'true'
       mvn: 'true'
 '''
 
-snapshots['test_command_artifact_paths_1 1'] = '''  - command: cmd
+snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
     artifact_paths: logs/**/*;coverage/**/*
 '''
 
-snapshots['test_command_artifact_paths_n 1'] = '''  - command: cmd
+snapshots['test_artifact_paths_n 1'] = '''  - command: cmd
     artifact_paths:
       - logs/**/*
       - coverage/**/*
 '''
 
-snapshots['test_command_parallelism 1'] = '''  - command: cmd
+snapshots['test_parallelism 1'] = '''  - command: cmd
     parallelism: 4
 '''
 
-snapshots['test_command_parallelism_1 1'] = '''  - command: cmd
+snapshots['test_parallelism_1 1'] = '''  - command: cmd
 '''
 
-snapshots['test_command_concurrency 1'] = '''  - command: cmd
+snapshots['test_concurrency 1'] = '''  - command: cmd
     concurrency: 2
     concurrency_group: my/group
 '''
 
-snapshots['test_parse_main 1'] = '''  - command: x
+snapshots['test_main 1'] = '''  - command: x
 '''
 
-snapshots['test_cli_command 1'] = '''  - command: x
+snapshots['test_command 1'] = '''  - command: x
 
 '''
 
-snapshots['test_cli_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
+snapshots['test_no_command 1'] = ''
+
+snapshots['test_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
 
 positional arguments:
   COMMENT     Comment
@@ -84,20 +81,20 @@ optional arguments:
   -h, --help  show this help message and exit
 '''
 
-snapshots['test_cli_help 2'] = '''usage:  steps [-h]
+snapshots['test_help 2'] = '''usage:  steps [-h]
 
 optional arguments:
   -h, --help  show this help message and exit
 '''
 
-snapshots['test_cli_help 3'] = '''usage:  env [-h] --var KEY VALUE
+snapshots['test_help 3'] = '''usage:  env [-h] --var KEY VALUE
 
 optional arguments:
   -h, --help       show this help message and exit
   --var KEY VALUE  A map of environment variables for this pipeline.
 '''
 
-snapshots['test_cli_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ...] [--label LABEL]
+snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ...] [--label LABEL]
                 [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
                 [--env KEY VALUE] [--agents KEY VALUE]
                 [--artifact-paths GLOB_OR_PATH [GLOB_OR_PATH ...]]
@@ -132,4 +129,7 @@ optional arguments:
                         creating with the concurrency attribute.
 '''
 
-snapshots['test_cli_no_command 1'] = ''
+snapshots['test_env_all 1'] = '''env:
+  a: b
+  c: d
+'''
