@@ -11,6 +11,11 @@ snapshots['test_comment 1'] = '# a b'
 
 snapshots['test_steps 1'] = 'steps:'
 
+snapshots['test_env 1'] = '''env:
+  a: b
+  c: d
+'''
+
 snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
 '''
 
@@ -29,22 +34,27 @@ snapshots['test_command_branches 1'] = '''  - command: cmd
     branches: master release-*
 '''
 
-snapshots['test_parse_main 1'] = '''  - command: x
-'''
-
 snapshots['test_command_env 1'] = '''  - command: cmd
     env:
       a: b
       c: d
 '''
 
-snapshots['test_env 1'] = '''env:
-  a: b
-  c: d
-'''
-
 snapshots['test_command_agents 1'] = '''  - command: cmd
     agents:
       npm: 'true'
       mvn: 'true'
+'''
+
+snapshots['test_parse_main 1'] = '''  - command: x
+'''
+
+snapshots['test_command_artifact_paths_1 1'] = '''  - command: cmd
+    artifact_paths: logs/**/*;coverage/**/*
+'''
+
+snapshots['test_command_artifact_paths_n 1'] = '''  - command: cmd
+    artifact_paths:
+      - logs/**/*
+      - coverage/**/*
 '''

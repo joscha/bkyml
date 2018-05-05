@@ -36,6 +36,23 @@ will produce
         - yarn test
 
 
+This allows you to dynamically generate pipelines:
+
+.. code:: bash
+
+  #!/bin/env bash
+  set -eu -o pipefail
+
+  bkyml comment "Pipeline for running all tests in test/*"
+  bkyml steps
+
+  # add a new command step to run the tests in each test directory
+  for test_dir in test/*/; do
+    bkyml command \
+        --command "run_tests ${test_dir}" \
+        --label "Run tests for '${test_dir}'"
+  done
+
 Sub-Commands
 ============
 
@@ -101,7 +118,9 @@ Example:
       --env FORCE_COLOR 1 \
       --branches master \
       --label ':yarn: tests' \
-      --agents yarn true
+      --agents yarn true \
+      --artifact-paths 'logs/**/*' 'coverage/**/*'
+
 
 will produce
 
@@ -116,3 +135,6 @@ will produce
       FORCE_COLOR: '1'
     agents:
       yarn: 'true'
+    artifact_paths:
+      - logs/**/*
+      - coverage/**/*

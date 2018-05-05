@@ -59,10 +59,25 @@ def test_command_agents(snapshot):
     ns.agents = [ ['npm', 'true'], ['mvn', 'true'] ]
     snapshot.assert_match(command(ns))
 
+def test_command_artifact_paths_1(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.artifact_paths = [[ "logs/**/*;coverage/**/*" ]]
+    snapshot.assert_match(command(ns))
+
+def test_command_artifact_paths_n(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.artifact_paths = [[ "logs/**/*", "coverage/**/*" ]]
+    snapshot.assert_match(command(ns))
+
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
 def test_cli():
-    testargs = ["--help"]
-    with patch.object(sys, 'argv', testargs):
+    with patch.object(sys, 'argv', ['--help']):
         run()
+
+#def test_cli_commands(snapshot):
+#    for subcommand in ['comment', 'steps', 'env', 'command']:
+#        snapshot.assert_match(parse_main([subcommand, '--help']))

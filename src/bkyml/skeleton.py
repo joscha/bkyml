@@ -38,6 +38,12 @@ def tuples_to_dict(tuples):
         ret[tuple[0]] = tuple[1]
     return ret
 
+def singlify(a_list):
+    if len(a_list) == 1:
+        return a_list[0]
+    else:
+        return a_list
+
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
     return f"# {lines}"
@@ -55,21 +61,27 @@ def command(ns):
     if ns_hasattr(ns, 'label'):
         step['label'] = ns.label
 
-    # command
+    # command (required)
     assert ns_hasattr(ns, 'command')
     command = sum(ns.command, [])
-    if len(command) == 1:
-        command = command[0]
-    step['command'] = command
+    step['command'] = singlify(command)
 
+    # branches
     if ns_hasattr(ns, 'branches'):
         step['branches'] = ' '.join(ns.branches)
 
+    # env
     if ns_hasattr(ns, 'env'):
         step['env'] = tuples_to_dict(ns.env)
 
+    # agents
     if ns_hasattr(ns, 'agents'):
         step['agents'] = tuples_to_dict(ns.agents)
+
+    # artifact_paths
+    if ns_hasattr(ns, 'artifact_paths'):
+        artifact_paths = sum(ns.artifact_paths, [])
+        step['artifact_paths'] = singlify(artifact_paths)
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -141,7 +153,6 @@ def parse_args(args):
         action='append',
         metavar=('KEY', 'VALUE')
     )
-
     parser_command.add_argument(
         '--agents',
         help="A map of meta-data keys to values to target specific agents for this step.",
@@ -149,6 +160,14 @@ def parse_args(args):
         nargs=2,
         action='append',
         metavar=('KEY', 'VALUE')
+    )
+    parser_command.add_argument(
+        '--artifact-paths',
+        help="The glob path or paths where artifacts from this step will be uploaded.",
+        nargs='+',
+        action='append',
+        type=str,
+        metavar="GLOB_OR_PATH"
     )
 
     parser_command.set_defaults(func=command)
