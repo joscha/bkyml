@@ -110,6 +110,24 @@ def describe_command():
         captured = capsys.readouterr()
         assert '--concurrency requires --concurrency-group' in captured.err
 
+    def test_timeout_in_minutes_minus(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.timeout_in_minutes = -1
+        snapshot.assert_match(Command.command(ns))
+
+    def test_timeout_in_minutes_0(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.timeout_in_minutes = 0
+        snapshot.assert_match(Command.command(ns))
+
+    def test_timeout_in_minutes_1(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.timeout_in_minutes = 1
+        snapshot.assert_match(Command.command(ns))
+
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))

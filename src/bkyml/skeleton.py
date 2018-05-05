@@ -158,6 +158,12 @@ class Command:
             type=str,
             metavar="GROUP_NAME"
         )
+        parser.add_argument(
+            '--timeout-in-minutes',
+            help="The number of minutes a job created from this step is allowed to run. If the job does not finish within this limit, it will be automatically cancelled and the build will fail.",
+            type=int,
+            metavar="TIMEOUT"
+        )
 
         parser.set_defaults(func=Command.command)
 
@@ -209,6 +215,10 @@ class Command:
             assert check_positive(ns.concurrency)
             step['concurrency'] = ns.concurrency
             step['concurrency_group'] = ns.concurrency_group
+
+        # timeout_in_minutes
+        if ns_hasattr(ns, 'timeout_in_minutes') and ns.timeout_in_minutes > 0:
+            step['timeout_in_minutes'] = ns.timeout_in_minutes
 
         yaml.indent(sequence=4, offset=2)
         return yaml.dump([ step ])

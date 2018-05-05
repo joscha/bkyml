@@ -101,6 +101,7 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--parallelism POSITIVE_NUMBER]
                 [--concurrency POSITIVE_NUMBER]
                 [--concurrency-group GROUP_NAME]
+                [--timeout-in-minutes TIMEOUT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -127,9 +128,24 @@ optional arguments:
   --concurrency-group GROUP_NAME
                         A unique name for the concurrency group that you are
                         creating with the concurrency attribute.
+  --timeout-in-minutes TIMEOUT
+                        The number of minutes a job created from this step is
+                        allowed to run. If the job does not finish within this
+                        limit, it will be automatically cancelled and the
+                        build will fail.
 '''
 
 snapshots['test_env_all 1'] = '''env:
   a: b
   c: d
+'''
+
+snapshots['test_timeout_in_minutes_minus 1'] = '''  - command: cmd
+'''
+
+snapshots['test_timeout_in_minutes_0 1'] = '''  - command: cmd
+'''
+
+snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
+    timeout_in_minutes: 1
 '''
