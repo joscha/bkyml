@@ -46,6 +46,12 @@ def test_command_label(snapshot):
     ns.label = 'My label'
     snapshot.assert_match(command(ns))
 
+def test_command_branches(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'a']]
+    ns.branches = [ 'master', 'release-*' ]
+    snapshot.assert_match(command(ns))
+
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 

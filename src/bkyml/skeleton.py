@@ -29,6 +29,9 @@ class MyYAML(YAML):
 yaml = MyYAML()
 yaml.default_flow_style = False
 
+def ns_hasattr(ns, attr):
+    return hasattr(ns, attr) and getattr(ns, attr) != None
+
 def comment(ns):
     lines = "\n# ".join(' '.join(ns.str).splitlines())
     return f"# {lines}"
@@ -51,15 +54,18 @@ def command(ns):
     step = {}
 
     # label
-    if hasattr(ns, 'label'):
+    if ns_hasattr(ns, 'label'):
         step['label'] = ns.label
 
     # command
+    assert ns_hasattr(ns, 'command')
     command = sum(ns.command, [])
     if len(command) == 1:
         command = command[0]
     step['command'] = command
 
+    if ns_hasattr(ns, 'branches'):
+        step['branches'] = ' '.join(ns.branches)
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -104,12 +110,21 @@ def parse_args(args):
         help="The shell command/s to run during this step.",
         nargs='+',
         action='append',
+        type=str,
+        metavar="STRING",
         required=True)
     parser_command.add_argument(
         '--label',
         help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
         type=str,
         metavar="STRING")
+    parser_command.add_argument(
+        '--branches',
+        help="The branch pattern defining which branches will include this step in their builds.",
+        type=str,
+        nargs='*',
+        metavar="STRING"
+    )
     parser_command.set_defaults(func=command)
 
     parser.add_argument(
