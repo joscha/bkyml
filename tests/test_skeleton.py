@@ -12,7 +12,7 @@ __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
 def test_check_positive_1():
-    assert check_positive(1) == True
+    assert check_positive(1)
 
 def test_check_positive_minus_1():
     with pytest.raises(argparse.ArgumentTypeError) as err:
