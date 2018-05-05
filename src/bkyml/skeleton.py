@@ -237,7 +237,6 @@ def setup_logging(loglevel):
 
 def parse_main(args):
     args = parse_args(args)
-
     setup_logging(args.loglevel)
     if hasattr(args, 'func'):
         return args.func(args)

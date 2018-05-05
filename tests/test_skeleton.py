@@ -114,6 +114,12 @@ def test_cli_command(snapshot, capsys):
     captured = capsys.readouterr()
     snapshot.assert_match(captured.out)
 
+def test_cli_no_command(snapshot, capsys):
+    with patch.object(sys, 'argv', ['']):
+        run()
+    captured = capsys.readouterr()
+    snapshot.assert_match(captured.out)
+
 def test_cli_help(snapshot, capsys):
     for subcommand in ['comment', 'steps', 'env', 'command']:
         with pytest.raises(SystemExit):

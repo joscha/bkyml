@@ -131,3 +131,5 @@ optional arguments:
                         A unique name for the concurrency group that you are
                         creating with the concurrency attribute.
 '''
+
+snapshots['test_cli_no_command 1'] = ''
