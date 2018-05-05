@@ -46,56 +46,167 @@ def singlify(a_list):
     else:
         return a_list
 
-def comment(ns):
-    lines = "\n# ".join(' '.join(ns.str).splitlines())
-    return f"# {lines}"
+class Comment:
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('comment')
+        parser.add_argument(
+            dest="str",
+            help="Comment",
+            type=str,
+            nargs='+',
+            metavar="COMMENT")
+        parser.set_defaults(func=Comment.comment)
 
-def steps(ns):
-    return "steps:"
+    @staticmethod
+    def comment(ns):
+        lines = "\n# ".join(' '.join(ns.str).splitlines())
+        return f"# {lines}"
 
-def env(ns):
-    return yaml.dump({ 'env': tuples_to_dict(ns.var) })
+class Steps:
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('steps')
+        parser.set_defaults(func=Steps.steps)
 
-def command(ns):
-    step = {}
+    @staticmethod
+    def steps(ns):
+        return "steps:"
 
-    # label
-    if ns_hasattr(ns, 'label'):
-        step['label'] = ns.label
+class Env:
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('env')
+        parser.add_argument(
+            '--var',
+            help="A map of environment variables for this pipeline.",
+            type=str,
+            nargs=2,
+            action='append',
+            metavar=('KEY', 'VALUE'),
+            required=True
+        )
+        parser.set_defaults(func=Env.env)
 
-    # command (required)
-    assert ns_hasattr(ns, 'command')
-    command = sum(ns.command, [])
-    step['command'] = singlify(command)
+    @staticmethod    
+    def env(ns):
+        return yaml.dump({ 'env': tuples_to_dict(ns.var) })
 
-    # branches
-    if ns_hasattr(ns, 'branches'):
-        step['branches'] = ' '.join(ns.branches)
+class Command:
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('command')
+        parser.add_argument(
+            '--command',
+            help="The shell command/s to run during this step.",
+            nargs='+',
+            action='append',
+            type=str,
+            metavar="COMMAND",
+            required=True)
+        parser.add_argument(
+            '--label',
+            help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
+            type=str,
+            metavar="LABEL")
+        parser.add_argument(
+            '--branches',
+            help="The branch pattern defining which branches will include this step in their builds.",
+            type=str,
+            nargs='+',
+            metavar="BRANCH_PATTERN"
+        )
+        parser.add_argument(
+            '--env',
+            help="A map of environment variables for this step.",
+            type=str,
+            nargs=2,
+            action='append',
+            metavar=('KEY', 'VALUE')
+        )
+        parser.add_argument(
+            '--agents',
+            help="A map of meta-data keys to values to target specific agents for this step.",
+            type=str,
+            nargs=2,
+            action='append',
+            metavar=('KEY', 'VALUE')
+        )
+        parser.add_argument(
+            '--artifact-paths',
+            help="The glob path or paths where artifacts from this step will be uploaded.",
+            nargs='+',
+            action='append',
+            type=str,
+            metavar="GLOB_OR_PATH"
+        )
+        parser.add_argument(
+            '--parallelism',
+            help="The number of parallel jobs that will be created based on this step.",
+            type=check_positive,
+            metavar="POSITIVE_NUMBER"
+        )
+        parser.add_argument(
+            '--concurrency',
+            help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.",
+            type=check_positive,
+            metavar="POSITIVE_NUMBER"
+        )
+        parser.add_argument(
+            '--concurrency-group',
+            help="A unique name for the concurrency group that you are creating with the concurrency attribute.",
+            type=str,
+            metavar="GROUP_NAME"
+        )
 
-    # env
-    if ns_hasattr(ns, 'env'):
-        step['env'] = tuples_to_dict(ns.env)
+        parser.set_defaults(func=Command.command)
 
-    # agents
-    if ns_hasattr(ns, 'agents'):
-        step['agents'] = tuples_to_dict(ns.agents)
+    @staticmethod
+    def assert_post_parse(parsed, parser):
+        if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
+            parser.error("--concurrency requires --concurrency-group.")
 
-    # artifact_paths
-    if ns_hasattr(ns, 'artifact_paths'):
-        artifact_paths = sum(ns.artifact_paths, [])
-        step['artifact_paths'] = singlify(artifact_paths)
+    @staticmethod            
+    def command(ns):
+        step = {}
 
-    # parallelism
-    if ns_hasattr(ns, 'parallelism') and ns.parallelism > 1:
-        step['parallelism'] = ns.parallelism
+        # label
+        if ns_hasattr(ns, 'label'):
+            step['label'] = ns.label
 
-    # concurrency and concurrency_group
-    if ns_hasattr(ns, 'concurrency') and ns_hasattr(ns, 'concurrency_group'):
-        step['concurrency'] = ns.concurrency
-        step['concurrency_group'] = ns.concurrency_group
+        # command (required)
+        assert ns_hasattr(ns, 'command')
+        command = sum(ns.command, [])
+        step['command'] = singlify(command)
 
-    yaml.indent(sequence=4, offset=2)
-    return yaml.dump([ step ])
+        # branches
+        if ns_hasattr(ns, 'branches'):
+            step['branches'] = ' '.join(ns.branches)
+
+        # env
+        if ns_hasattr(ns, 'env'):
+            step['env'] = tuples_to_dict(ns.env)
+
+        # agents
+        if ns_hasattr(ns, 'agents'):
+            step['agents'] = tuples_to_dict(ns.agents)
+
+        # artifact_paths
+        if ns_hasattr(ns, 'artifact_paths'):
+            artifact_paths = sum(ns.artifact_paths, [])
+            step['artifact_paths'] = singlify(artifact_paths)
+
+        # parallelism
+        if ns_hasattr(ns, 'parallelism') and ns.parallelism > 1:
+            step['parallelism'] = ns.parallelism
+
+        # concurrency and concurrency_group
+        if ns_hasattr(ns, 'concurrency') and ns_hasattr(ns, 'concurrency_group'):
+            step['concurrency'] = ns.concurrency
+            step['concurrency_group'] = ns.concurrency_group
+
+        yaml.indent(sequence=4, offset=2)
+        return yaml.dump([ step ])
 
 def parse_args(args):
     """Parse command line parameters
@@ -112,94 +223,11 @@ def parse_args(args):
     subparsers = parser.add_subparsers(title='subcommands',
                                        description='valid subcommands',
                                        help='additional help')
-    parser_comment = subparsers.add_parser('comment')
-    parser_comment.add_argument(
-        dest="str",
-        help="Comment",
-        type=str,
-        nargs='+',
-        metavar="COMMENT")
-    parser_comment.set_defaults(func=comment)
-    parser_steps = subparsers.add_parser('steps')
-    parser_steps.set_defaults(func=steps)
 
-    parser_env = subparsers.add_parser('env')
-    parser_env.add_argument(
-        '--var',
-        help="A map of environment variables for this pipeline.",
-        type=str,
-        nargs=2,
-        action='append',
-        metavar=('KEY', 'VALUE'),
-        required=True
-    )
-    parser_env.set_defaults(func=env)
-
-    parser_command = subparsers.add_parser('command')
-    parser_command.add_argument(
-        '--command',
-        help="The shell command/s to run during this step.",
-        nargs='+',
-        action='append',
-        type=str,
-        metavar="COMMAND",
-        required=True)
-    parser_command.add_argument(
-        '--label',
-        help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
-        type=str,
-        metavar="LABEL")
-    parser_command.add_argument(
-        '--branches',
-        help="The branch pattern defining which branches will include this step in their builds.",
-        type=str,
-        nargs='+',
-        metavar="BRANCH_PATTERN"
-    )
-    parser_command.add_argument(
-        '--env',
-        help="A map of environment variables for this step.",
-        type=str,
-        nargs=2,
-        action='append',
-        metavar=('KEY', 'VALUE')
-    )
-    parser_command.add_argument(
-        '--agents',
-        help="A map of meta-data keys to values to target specific agents for this step.",
-        type=str,
-        nargs=2,
-        action='append',
-        metavar=('KEY', 'VALUE')
-    )
-    parser_command.add_argument(
-        '--artifact-paths',
-        help="The glob path or paths where artifacts from this step will be uploaded.",
-        nargs='+',
-        action='append',
-        type=str,
-        metavar="GLOB_OR_PATH"
-    )
-    parser_command.add_argument(
-        '--parallelism',
-        help="The number of parallel jobs that will be created based on this step.",
-        type=check_positive,
-        metavar="POSITIVE_NUMBER"
-    )
-    parser_command.add_argument(
-        '--concurrency',
-        help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.",
-        type=check_positive,
-        metavar="POSITIVE_NUMBER"
-    )
-    parser_command.add_argument(
-        '--concurrency-group',
-        help="A unique name for the concurrency group that you are creating with the concurrency attribute.",
-        type=str,
-        metavar="GROUP_NAME"
-    )
-
-    parser_command.set_defaults(func=command)
+    Comment.install(subparsers)
+    Steps.install(subparsers)
+    Env.install(subparsers)
+    Command.install(subparsers)
 
     parser.add_argument(
         '--version',
@@ -221,8 +249,7 @@ def parse_args(args):
         const=logging.DEBUG)
 
     parsed = parser.parse_args(args)
-    if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
-        parser.error("--concurrency requires --concurrency-group.")
+    Command.assert_post_parse(parsed, parser)
     return parsed
 
 def setup_logging(loglevel):
