@@ -14,7 +14,6 @@ __license__ = "mit"
 def test_comment(snapshot):
     ns = argparse.Namespace()
     ns.str = ['a', 'b']
-
     snapshot.assert_match(comment(ns))
 
 def test_steps(snapshot):
@@ -47,10 +46,10 @@ def test_command_label(snapshot):
     ns.label = 'My label'
     snapshot.assert_match(command(ns))
 
-def test_cli(snapshot):
+def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
-def test_run():
+def test_cli():
     testargs = ["--help"]
     with patch.object(sys, 'argv', testargs):
         run()

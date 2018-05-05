@@ -34,6 +34,6 @@ snapshots['test_command_label 1'] = '''  - label: My label
     command: a
 '''
 
-snapshots['test_cli 1'] = '''  - label:
+snapshots['test_parse_main 1'] = '''  - label:
     command: x
 '''
