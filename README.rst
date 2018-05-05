@@ -119,7 +119,8 @@ Example:
       --branches master \
       --label ':yarn: tests' \
       --agents yarn true \
-      --artifact-paths 'logs/**/*' 'coverage/**/*'
+      --artifact-paths 'logs/**/*' 'coverage/**/*' \
+      --parallelism 5
 
 
 will produce
@@ -138,3 +139,4 @@ will produce
     artifact_paths:
       - logs/**/*
       - coverage/**/*
+    parallelism: 5

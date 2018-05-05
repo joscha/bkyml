@@ -29,6 +29,12 @@ class MyYAML(YAML):
 yaml = MyYAML()
 yaml.default_flow_style = False
 
+def check_positive(value):
+    ivalue = int(value)
+    if ivalue <= 0:
+         raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+    return ivalue
+
 def ns_hasattr(ns, attr):
     return hasattr(ns, attr) and getattr(ns, attr) != None
 
@@ -82,6 +88,10 @@ def command(ns):
     if ns_hasattr(ns, 'artifact_paths'):
         artifact_paths = sum(ns.artifact_paths, [])
         step['artifact_paths'] = singlify(artifact_paths)
+
+    # parallelism
+    if ns_hasattr(ns, 'parallelism') and ns.parallelism > 1:
+        step['parallelism'] = ns.parallelism
 
     yaml.indent(sequence=4, offset=2)
     return yaml.dump([ step ])
@@ -168,6 +178,12 @@ def parse_args(args):
         action='append',
         type=str,
         metavar="GLOB_OR_PATH"
+    )
+    parser_command.add_argument(
+        '--parallelism',
+        help="The number of parallel jobs that will be created based on this step. ",
+        type=check_positive,
+        metavar="POSITIVE_NUMBER"
     )
 
     parser_command.set_defaults(func=command)

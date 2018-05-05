@@ -58,3 +58,10 @@ snapshots['test_command_artifact_paths_n 1'] = '''  - command: cmd
       - logs/**/*
       - coverage/**/*
 '''
+
+snapshots['test_command_parallelism 1'] = '''  - command: cmd
+    parallelism: 4
+'''
+
+snapshots['test_command_parallelism_1 1'] = '''  - command: cmd
+'''

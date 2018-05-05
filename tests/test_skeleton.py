@@ -71,6 +71,18 @@ def test_command_artifact_paths_n(snapshot):
     ns.artifact_paths = [[ "logs/**/*", "coverage/**/*" ]]
     snapshot.assert_match(command(ns))
 
+def test_command_parallelism(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.parallelism = 4
+    snapshot.assert_match(command(ns))
+
+def test_command_parallelism_1(snapshot):
+    ns = argparse.Namespace()
+    ns.command = [ [ 'cmd' ] ]
+    ns.parallelism = 1
+    snapshot.assert_match(command(ns))
+
 def test_parse_main(snapshot):
     snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
