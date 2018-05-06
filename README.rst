@@ -171,3 +171,25 @@ And:
   --retry-manual-reason REASON (giving a reason why retries are forbidden)
   --retry-manual-permit-on-passed (allowing retries after the job has passed)
   --no-retry-manual-permit-on-passed (disallowing retries after the job has passed, default)
+
+Example:
+
+.. code:: shell
+
+  bkyaml command \
+    --command 'x' \
+    --retry manual \
+    --retry-manual-permit-on-passed \
+    --no-retry-manual-allowed \
+    --retry-manual-reason "Just because"
+
+will result in
+
+.. code:: yaml
+
+  - command: x
+    retry:
+      manual:
+        allowed: false
+        reason: Just because
+        permit_on_passed: true
