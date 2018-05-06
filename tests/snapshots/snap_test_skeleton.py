@@ -104,10 +104,6 @@ snapshots['test_env_all 1'] = '''env:
   c: d
 '''
 
-snapshots['test_skip_bool_true 1'] = '''  - command: cmd
-    skip: true
-'''
-
 snapshots['test_skip_bool_false 1'] = '''  - command: cmd
 '''
 
@@ -127,10 +123,6 @@ snapshots['test_command_n 1'] = '''  - command:
 
 snapshots['test_label 1'] = '''  - label: My label
     command: cmd
-'''
-
-snapshots['test_branches 1'] = '''  - command: cmd
-    branches: master release-*
 '''
 
 snapshots['test_env 1'] = '''  - command: cmd
@@ -178,11 +170,6 @@ snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
 '''
 
 snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
-'''
-
-snapshots['test_retry_manual 1'] = '''  - command: cmd
-    retry:
-      manual: true
 '''
 
 snapshots['test_retry_automatic 1'] = '''  - command: cmd
@@ -233,4 +220,17 @@ snapshots['test_retry_automatic_tuple_n 1'] = '''  - command: cmd
           limit: 2
         - exit_status: 1
           limit: 3
+'''
+
+snapshots['test_branches 1'] = '''  - command: cmd
+    branches: master release-*
+'''
+
+snapshots['test_skip_bool_true 1'] = '''  - command: cmd
+    skip: true
+'''
+
+snapshots['test_retry_manual 1'] = '''  - command: cmd
+    retry:
+      manual: true
 '''

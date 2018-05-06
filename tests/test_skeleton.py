@@ -46,76 +46,64 @@ def describe_env():
         snapshot.assert_match(Env.env(ns))
 
 def describe_command():
-    def test_command_1(snapshot):
-        ns = argparse.Namespace()
+
+    @pytest.fixture
+    def ns():
+        return argparse.Namespace()
+
+    @pytest.fixture
+    def generic_command_call(ns, snapshot):
+        ns.command = [[ 'cmd' ]]
+        snapshot.assert_match(Command.command(ns))
+
+    def test_command_1(ns, snapshot):
         ns.command = [[ "my-command arg1 'arg 2'" ]]
         snapshot.assert_match(Command.command(ns))
 
-    def test_command_n(snapshot):
-        ns = argparse.Namespace()
+    def test_command_n(ns, snapshot):
         ns.command = [ [ 'a', 'b' ], [ 'c', 'd' ] ]
         snapshot.assert_match(Command.command(ns))
 
-    def test_label(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_label(ns, snapshot):
         ns.label = 'My label'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_branches(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
-        ns.branches = [ 'master', 'release-*' ]
-        snapshot.assert_match(Command.command(ns))
+    def test_branches(ns, snapshot):
+        ns.branches = ['master', 'release-*']
+        generic_command_call(ns, snapshot)
 
-    def test_env(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
-        ns.env = [ ['a', 'b'], ['c', 'd'] ]
-        snapshot.assert_match(Command.command(ns))
+    def test_env(ns, snapshot):
+        ns.env = [['a', 'b'], ['c', 'd']]
+        generic_command_call(ns, snapshot)
 
-    def test_agents(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
-        ns.agents = [ ['npm', 'true'], ['mvn', 'true'] ]
-        snapshot.assert_match(Command.command(ns))
+    def test_agents(ns, snapshot):
+        ns.agents = [['npm', 'true'], ['mvn', 'true']]
+        generic_command_call(ns, snapshot)
 
-    def test_artifact_paths_0(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_artifact_paths_0(ns, snapshot):
         ns.artifact_paths = []
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_artifact_paths_1(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_artifact_paths_1(ns, snapshot):
         ns.artifact_paths = [[ "logs/**/*;coverage/**/*" ]]
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_artifact_paths_n(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_artifact_paths_n(ns, snapshot):
         ns.artifact_paths = [[ "logs/**/*", "coverage/**/*" ]]
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_parallelism(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_parallelism(ns, snapshot):
         ns.parallelism = 4
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_parallelism_1(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_parallelism_1(ns, snapshot):
         ns.parallelism = 1
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_concurrency(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_concurrency(ns, snapshot):
         ns.concurrency = 2
         ns.concurrency_group = 'my/group'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
     def test_concurrency_cli(capsys):
         with pytest.raises(SystemExit) as sys_exit:
@@ -124,103 +112,73 @@ def describe_command():
         captured = capsys.readouterr()
         assert '--concurrency requires --concurrency-group' in captured.err
 
-    def test_timeout_in_minutes_minus(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_timeout_in_minutes_minus(ns, snapshot):
         ns.timeout_in_minutes = -1
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_timeout_in_minutes_0(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_timeout_in_minutes_0(ns, snapshot):
         ns.timeout_in_minutes = 0
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_timeout_in_minutes_1(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_timeout_in_minutes_1(ns, snapshot):
         ns.timeout_in_minutes = 1
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_skip_bool_true(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_skip_bool_true(ns, snapshot):
         ns.skip = True
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_skip_bool_false(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_skip_bool_false(ns, snapshot):
         ns.skip = False
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_skip_string(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_skip_string(ns, snapshot):
         ns.skip = 'Some reason'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_manual(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_manual(ns, snapshot):
         ns.retry = 'manual'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic(ns, snapshot):
         ns.retry = 'automatic'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_limit(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_limit(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_limit = 2
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_limit_11(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_limit_11(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_limit = 11
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_exit_status_star(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_exit_status_star(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_exit_status = '*'
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_exit_status_number(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_exit_status_number(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_exit_status = 1
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_exit_status_and_limit(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_exit_status_and_limit(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_limit = 2
         ns.retry_automatic_exit_status = 1
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_tuple_0(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_tuple_0(ns, snapshot):
         ns.retry = 'automatic'
         ns.retry_automatic_tuple = []
-        snapshot.assert_match(Command.command(ns))
+        generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_tuple_n(snapshot):
-        ns = argparse.Namespace()
-        ns.command = [ [ 'cmd' ] ]
+    def test_retry_automatic_tuple_n(ns, snapshot):
         ns.retry = 'automatic'
-        ns.retry_automatic_tuple = [ ['*', 2], [ 1, 3 ]]
-        snapshot.assert_match(Command.command(ns))
+        ns.retry_automatic_tuple = [['*', 2], [ 1, 3 ]]
+        generic_command_call(ns, snapshot)
 
     def test_retry_automatic_cli_exit_status_string(capsys):
         with pytest.raises(SystemExit) as sys_exit:
