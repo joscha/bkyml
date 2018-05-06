@@ -17,7 +17,7 @@ __license__ = "mit"
 _logger = logging.getLogger(__name__)
 
 class MyYAML(YAML):
-    def dump(self, data, **kw):
+    def dump(self, data, stream=None, **kw):
         stream = StringIO()
         YAML.dump(self, data, stream, **kw)
         return stream.getvalue()
@@ -28,16 +28,15 @@ yaml.default_flow_style = False
 def check_positive(value):
     ivalue = int(value)
     if ivalue <= 0:
-         raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+        raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
     return ivalue
 
 def bool_or_string(value):
     if value.lower() == 'true':
         return True
-    elif value.lower() == 'false':
+    if value.lower() == 'false':
         return False
-    else:
-        return value
+    return value
 
 def int_or_star(value):
     if value == '*':
@@ -45,7 +44,7 @@ def int_or_star(value):
     else:
         try:
             return int(value)
-        except(ValueError):
+        except ValueError:
             raise argparse.ArgumentTypeError("%s is an invalid value" % value)
 
 def ns_hasattr(ns, attr):
@@ -53,15 +52,14 @@ def ns_hasattr(ns, attr):
 
 def tuples_to_dict(tuples):
     ret = {}
-    for tuple in tuples:
-        ret[tuple[0]] = tuple[1]
+    for tpl in tuples:
+        ret[tpl[0]] = tpl[1]
     return ret
 
 def singlify(a_list):
     if len(a_list) == 1:
         return a_list[0]
-    else:
-        return a_list
+    return a_list
 
 class Comment:
     @staticmethod
@@ -105,11 +103,15 @@ class Env:
         )
         parser.set_defaults(func=Env.env)
 
-    @staticmethod    
+    @staticmethod
     def env(ns):
-        return yaml.dump({ 'env': tuples_to_dict(ns.var) })
+        return yaml.dump({
+            'env': tuples_to_dict(ns.var),
+        })
 
 class Command:
+
+    # pylint: disable=line-too-long
     @staticmethod
     def install(action):
         parser = action.add_parser('command')
@@ -235,8 +237,7 @@ class Command:
         if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_limit'):
             parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.')
 
-
-    @staticmethod            
+    @staticmethod
     def command(ns):
         step = {}
 
@@ -247,7 +248,7 @@ class Command:
         # command (required)
         assert ns_hasattr(ns, 'command')
         command = sum(ns.command, [])
-        assert len(command) > 0
+        assert command
         step['command'] = singlify(command)
 
         # branches
@@ -265,7 +266,7 @@ class Command:
         # artifact_paths
         if ns_hasattr(ns, 'artifact_paths'):
             artifact_paths = sum(ns.artifact_paths, [])
-            if len(artifact_paths) > 0:
+            if artifact_paths:
                 step['artifact_paths'] = singlify(artifact_paths)
 
         # parallelism
@@ -299,12 +300,12 @@ class Command:
                 if ns_hasattr(ns, 'retry_automatic_limit'):
                     retry[ns.retry]['limit'] = min(10, ns.retry_automatic_limit)
                 if ns_hasattr(ns, 'retry_automatic_tuple'):
-                    if len(ns.retry_automatic_tuple) > 0:
+                    if ns.retry_automatic_tuple:
                         retry[ns.retry] = []
-                        for tuple in ns.retry_automatic_tuple:
+                        for tpl in ns.retry_automatic_tuple:
                             retry[ns.retry].append({
-                                'exit_status': int_or_star(tuple[0]),
-                                'limit': min(10, check_positive(tuple[1])),
+                                'exit_status': int_or_star(tpl[0]),
+                                'limit': min(10, check_positive(tpl[1])),
                             })
                     else:
                         retry[ns.retry] = True
@@ -314,7 +315,7 @@ class Command:
             step['retry'] = retry
 
         yaml.indent(sequence=4, offset=2)
-        return yaml.dump([ step ])
+        return yaml.dump([step])
 
 def parse_args(args):
     """Parse command line parameters
@@ -375,8 +376,7 @@ def parse_main(args):
     setup_logging(args.loglevel)
     if hasattr(args, 'func'):
         return args.func(args)
-    else:
-        return None
+    return None
 
 def main(args):
     """Main entry point allowing external calls

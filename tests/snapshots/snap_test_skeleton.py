@@ -99,11 +99,6 @@ optional arguments:
                         retry and a limit to go with it.
 '''
 
-snapshots['test_env_all 1'] = '''env:
-  a: b
-  c: d
-'''
-
 snapshots['test_skip_bool_false 1'] = '''  - command: cmd
 '''
 
@@ -123,18 +118,6 @@ snapshots['test_command_n 1'] = '''  - command:
 
 snapshots['test_label 1'] = '''  - label: My label
     command: cmd
-'''
-
-snapshots['test_env 1'] = '''  - command: cmd
-    env:
-      a: b
-      c: d
-'''
-
-snapshots['test_agents 1'] = '''  - command: cmd
-    agents:
-      npm: 'true'
-      mvn: 'true'
 '''
 
 snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
@@ -233,4 +216,21 @@ snapshots['test_skip_bool_true 1'] = '''  - command: cmd
 snapshots['test_retry_manual 1'] = '''  - command: cmd
     retry:
       manual: true
+'''
+
+snapshots['test_env_all 1'] = '''env:
+  a: b
+  c: d
+'''
+
+snapshots['test_env 1'] = '''  - command: cmd
+    env:
+      a: b
+      c: d
+'''
+
+snapshots['test_agents 1'] = '''  - command: cmd
+    agents:
+      npm: 'true'
+      mvn: 'true'
 '''
