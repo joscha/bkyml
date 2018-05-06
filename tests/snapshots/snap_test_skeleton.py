@@ -50,6 +50,7 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--concurrency POSITIVE_NUMBER]
                 [--concurrency-group GROUP_NAME]
                 [--timeout-in-minutes TIMEOUT] [--skip BOOL_OR_STRING]
+                [--retry {automatic,manual}]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -83,6 +84,8 @@ optional arguments:
                         build will fail.
   --skip BOOL_OR_STRING
                         Whether to skip this step or not.
+  --retry {automatic,manual}
+                        The conditions for retrying this step.
 '''
 
 snapshots['test_env_all 1'] = '''env:
@@ -164,4 +167,14 @@ snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
 '''
 
 snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
+'''
+
+snapshots['test_retry_manual 1'] = '''  - command: cmd
+    retry:
+      manual: true
+'''
+
+snapshots['test_retry_automatic 1'] = '''  - command: cmd
+    retry:
+      automatic: true
 '''

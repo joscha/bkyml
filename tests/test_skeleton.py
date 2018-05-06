@@ -160,6 +160,18 @@ def describe_command():
         ns.skip = 'Some reason'
         snapshot.assert_match(Command.command(ns))
 
+    def test_retry_manual(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'manual'
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        snapshot.assert_match(Command.command(ns))
+
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))

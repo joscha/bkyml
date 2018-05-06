@@ -178,6 +178,11 @@ class Command:
             type=bool_or_string,
             metavar="BOOL_OR_STRING"
         )
+        parser.add_argument(
+            '--retry',
+            help="The conditions for retrying this step.",
+            choices=['automatic', 'manual']
+        )
 
         parser.set_defaults(func=Command.command)
 
@@ -234,8 +239,15 @@ class Command:
         if ns_hasattr(ns, 'timeout_in_minutes') and ns.timeout_in_minutes > 0:
             step['timeout_in_minutes'] = ns.timeout_in_minutes
 
+        # skip
         if ns_hasattr(ns, 'skip') and (ns.skip is True or type(ns.skip) is str):
             step['skip'] = ns.skip
+
+        # retry
+        if ns_hasattr(ns, 'retry'):
+            retry = {}
+            retry[ns.retry] = True
+            step['retry'] = retry
 
         yaml.indent(sequence=4, offset=2)
         return yaml.dump([ step ])
