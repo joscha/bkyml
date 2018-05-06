@@ -79,7 +79,8 @@ Example:
 
 .. code:: shell
 
-  bkyml comment bla foo
+  bkyml comment \
+    bla foo
 
 will produce
 
@@ -95,7 +96,9 @@ Example:
 
 .. code:: shell
 
-  bkyaml env --var A B --var C D
+  bkyaml env \
+    --var A B \
+    --var C D
 
 will produce
 
