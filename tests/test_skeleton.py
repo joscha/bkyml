@@ -236,17 +236,19 @@ def describe_parse_main():
         snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
 def describe_cli():
-    def test_command(snapshot, capsys):
-        with patch.object(sys, 'argv', ['', 'command', '--command', 'x']):
+
+    @pytest.fixture
+    def run_run(capsys, snapshot, args):
+        with patch.object(sys, 'argv', [''] + args):
             run()
         captured = capsys.readouterr()
         snapshot.assert_match(captured.out)
 
+    def test_command(snapshot, capsys):
+        run_run(capsys, snapshot, ['command', '--command', 'x'])
+
     def test_no_command(snapshot, capsys):
-        with patch.object(sys, 'argv', ['']):
-            run()
-        captured = capsys.readouterr()
-        snapshot.assert_match(captured.out)
+        run_run(capsys, snapshot, [])
 
     def test_help(snapshot, capsys):
         for subcommand in ['comment', 'steps', 'env', 'command']:
