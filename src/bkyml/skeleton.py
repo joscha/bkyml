@@ -50,8 +50,8 @@ def int_or_star(value):
         except ValueError:
             raise argparse.ArgumentTypeError("%s is an invalid value" % value)
 
-def ns_hasattr(ns, attr):
-    return hasattr(ns, attr) and getattr(ns, attr) is not None
+def ns_hasattr(namespace, attr):
+    return hasattr(namespace, attr) and getattr(namespace, attr) is not None
 
 def tuples_to_dict(tuples):
     ret = {}
@@ -77,8 +77,8 @@ class Comment:
         parser.set_defaults(func=Comment.comment)
 
     @staticmethod
-    def comment(ns):
-        lines = "\n# ".join(' '.join(ns.str).splitlines())
+    def comment(namespace):
+        lines = "\n# ".join(' '.join(namespace.str).splitlines())
         return f"# {lines}"
 
 class Steps:
@@ -88,7 +88,7 @@ class Steps:
         parser.set_defaults(func=Steps.steps)
 
     @staticmethod
-    def steps(ns):
+    def steps(namespace):
         return "steps:"
 
 class Env:
@@ -107,9 +107,9 @@ class Env:
         parser.set_defaults(func=Env.env)
 
     @staticmethod
-    def env(ns):
+    def env(namespace):
         return yaml.dump({
-            'env': tuples_to_dict(ns.var),
+            'env': tuples_to_dict(namespace.var),
         })
 
 class Command:
@@ -284,87 +284,87 @@ class Command:
                 parser.error('--retry-manual-reason requires --retry manual.')
 
     @staticmethod
-    def command(ns):
+    def command(namespace):
         step = {}
 
         # label
-        if ns_hasattr(ns, 'label'):
-            step['label'] = ns.label
+        if ns_hasattr(namespace, 'label'):
+            step['label'] = namespace.label
 
         # command (required)
-        assert ns_hasattr(ns, 'command')
-        command = sum(ns.command, [])
+        assert ns_hasattr(namespace, 'command')
+        command = sum(namespace.command, [])
         assert command
         step['command'] = singlify(command)
 
         # branches
-        if ns_hasattr(ns, 'branches'):
-            step['branches'] = ' '.join(ns.branches)
+        if ns_hasattr(namespace, 'branches'):
+            step['branches'] = ' '.join(namespace.branches)
 
         # env
-        if ns_hasattr(ns, 'env'):
-            step['env'] = tuples_to_dict(ns.env)
+        if ns_hasattr(namespace, 'env'):
+            step['env'] = tuples_to_dict(namespace.env)
 
         # agents
-        if ns_hasattr(ns, 'agents'):
-            step['agents'] = tuples_to_dict(ns.agents)
+        if ns_hasattr(namespace, 'agents'):
+            step['agents'] = tuples_to_dict(namespace.agents)
 
         # artifact_paths
-        if ns_hasattr(ns, 'artifact_paths'):
-            artifact_paths = sum(ns.artifact_paths, [])
+        if ns_hasattr(namespace, 'artifact_paths'):
+            artifact_paths = sum(namespace.artifact_paths, [])
             if artifact_paths:
                 step['artifact_paths'] = singlify(artifact_paths)
 
         # parallelism
-        if ns_hasattr(ns, 'parallelism'):
-            assert check_positive(ns.parallelism)
-            if ns.parallelism > 1:
-                step['parallelism'] = ns.parallelism
+        if ns_hasattr(namespace, 'parallelism'):
+            assert check_positive(namespace.parallelism)
+            if namespace.parallelism > 1:
+                step['parallelism'] = namespace.parallelism
 
         # concurrency and concurrency_group
-        if ns_hasattr(ns, 'concurrency') and ns_hasattr(ns, 'concurrency_group'):
-            assert check_positive(ns.concurrency)
-            step['concurrency'] = ns.concurrency
-            step['concurrency_group'] = ns.concurrency_group
+        if ns_hasattr(namespace, 'concurrency') and ns_hasattr(namespace, 'concurrency_group'):
+            assert check_positive(namespace.concurrency)
+            step['concurrency'] = namespace.concurrency
+            step['concurrency_group'] = namespace.concurrency_group
 
         # timeout_in_minutes
-        if ns_hasattr(ns, 'timeout_in_minutes') and ns.timeout_in_minutes > 0:
-            step['timeout_in_minutes'] = ns.timeout_in_minutes
+        if ns_hasattr(namespace, 'timeout_in_minutes') and namespace.timeout_in_minutes > 0:
+            step['timeout_in_minutes'] = namespace.timeout_in_minutes
 
         # skip
-        if ns_hasattr(ns, 'skip') and (ns.skip is True or type(ns.skip) is str):
-            step['skip'] = ns.skip
+        if ns_hasattr(namespace, 'skip') and (namespace.skip is True or type(namespace.skip) is str):
+            step['skip'] = namespace.skip
 
         # retry
-        if ns_hasattr(ns, 'retry'):
+        if ns_hasattr(namespace, 'retry'):
             retry = {}
-            retry[ns.retry] = {}
+            retry[namespace.retry] = {}
 
-            if ns.retry == 'automatic':
-                if ns_hasattr(ns, 'retry_automatic_exit_status'):
-                    retry[ns.retry]['exit_status'] = ns.retry_automatic_exit_status
-                if ns_hasattr(ns, 'retry_automatic_limit'):
-                    retry[ns.retry]['limit'] = min(10, ns.retry_automatic_limit)
-                if ns_hasattr(ns, 'retry_automatic_tuple'):
-                    if ns.retry_automatic_tuple:
-                        retry[ns.retry] = []
-                        for tpl in ns.retry_automatic_tuple:
-                            retry[ns.retry].append({
+            if namespace.retry == 'automatic':
+                if ns_hasattr(namespace, 'retry_automatic_exit_status'):
+                    retry[namespace.retry]['exit_status'] = namespace.retry_automatic_exit_status
+                if ns_hasattr(namespace, 'retry_automatic_limit'):
+                    retry[namespace.retry]['limit'] = min(10, namespace.retry_automatic_limit)
+                if ns_hasattr(namespace, 'retry_automatic_tuple'):
+                    if namespace.retry_automatic_tuple:
+                        retry[namespace.retry] = []
+                        for tpl in namespace.retry_automatic_tuple:
+                            retry[namespace.retry].append({
                                 'exit_status': int_or_star(tpl[0]),
                                 'limit': min(10, check_positive(tpl[1])),
                             })
-            elif ns.retry == 'manual':
-                if ns_hasattr(ns, 'retry_manual_allowed') and not ns.retry_manual_allowed:
-                    retry[ns.retry]['allowed'] = ns.retry_manual_allowed
-                if ns_hasattr(ns, 'retry_manual_reason'):
-                    retry[ns.retry]['reason'] = ns.retry_manual_reason
-                if ns_hasattr(ns, 'retry_manual_permit_on_passed') and ns.retry_manual_permit_on_passed:
-                    retry[ns.retry]['permit_on_passed'] = ns.retry_manual_permit_on_passed
+            elif namespace.retry == 'manual':
+                if ns_hasattr(namespace, 'retry_manual_allowed') and not namespace.retry_manual_allowed:
+                    retry[namespace.retry]['allowed'] = namespace.retry_manual_allowed
+                if ns_hasattr(namespace, 'retry_manual_reason'):
+                    retry[namespace.retry]['reason'] = namespace.retry_manual_reason
+                if ns_hasattr(namespace, 'retry_manual_permit_on_passed') and namespace.retry_manual_permit_on_passed:
+                    retry[namespace.retry]['permit_on_passed'] = namespace.retry_manual_permit_on_passed
             else:
-                raise argparse.ArgumentTypeError("%s is an invalid retry value" % ns.retry)
+                raise argparse.ArgumentTypeError("%s is an invalid retry value" % namespace.retry)
 
-            if not retry[ns.retry]:
-                retry[ns.retry] = True
+            if not retry[namespace.retry]:
+                retry[namespace.retry] = True
             step['retry'] = retry
 
         yaml.indent(sequence=4, offset=2)
