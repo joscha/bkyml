@@ -188,6 +188,41 @@ def describe_command():
         captured = capsys.readouterr()
         assert 'xxx is an invalid value' in captured.err
 
+    def test_retry_automatic_cli_exit_status_no_retry(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry-automatic-exit-status', '*'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert '--retry-automatic-exit-status requires --retry automatic' in captured.err
+
+    def test_retry_automatic_cli_limit_no_retry(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry-automatic-limit', '2'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert '--retry-automatic-limit requires --retry automatic' in captured.err
+
+    def test_retry_automatic_cli_tuple_no_retry(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry-automatic-tuple', '*', '2'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert '--retry-automatic-tuple requires --retry automatic' in captured.err
+
+    def test_retry_automatic_cli_tuple_no_combine_exit_status(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-exit-status', '*'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert '--retry-automatic-tuple can not be combined with --retry-automatic-exit-status' in captured.err
+
+    def test_retry_automatic_cli_tuple_no_combine_limit(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-limit', '2'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert '--retry-automatic-tuple can not be combined with --retry-automatic-limit' in captured.err
+
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))
