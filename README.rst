@@ -14,13 +14,13 @@ Example:
 
 .. code:: shell
 
-  bkyaml comment 'Frontend tests pipeline'
-  bkyaml env FORCE_COLOR=1
-  bkyaml steps
+  bkyml comment 'Frontend tests pipeline'
+  bkyml env FORCE_COLOR=1
+  bkyml steps
   bkyml command \
-    --command 'yarn install' \
-    --command 'yarn test' \
-    --label ':karma: tests'
+      --command 'yarn install' \
+      --command 'yarn test' \
+      --label ':karma: tests'
 
 will produce
 
@@ -87,7 +87,7 @@ Example:
 .. code:: shell
 
   bkyml comment \
-    bla foo
+      bla foo
 
 will produce
 
@@ -103,9 +103,9 @@ Example:
 
 .. code:: shell
 
-  bkyaml env \
-    --var A B \
-    --var C D
+  bkyml env \
+      --var A B \
+      --var C D
 
 will produce
 
@@ -122,7 +122,7 @@ Example:
 
 .. code:: shell
 
-  bkyaml command \
+  bkyml command \
       --command 'yarn install' \
       --command 'yarn test' \
       --env FORCE_COLOR 1 \
@@ -186,12 +186,12 @@ Example:
 
 .. code:: shell
 
-  bkyaml command \
-    --command 'x' \
-    --retry manual \
-    --retry-manual-permit-on-passed \
-    --no-retry-manual-allowed \
-    --retry-manual-reason "Just because"
+  bkyml command \
+      --command 'x' \
+      --retry manual \
+      --retry-manual-permit-on-passed \
+      --no-retry-manual-allowed \
+      --retry-manual-reason "Just because"
 
 will result in
 
