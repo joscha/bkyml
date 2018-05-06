@@ -32,9 +32,9 @@ def check_positive(value):
     return ivalue
 
 def bool_or_string(value):
-    if value.lower() is 'true':
+    if value.lower() == 'true':
         return True
-    elif value.lower() is 'false':
+    elif value.lower() == 'false':
         return False
     else:
         return value

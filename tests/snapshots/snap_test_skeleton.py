@@ -162,3 +162,6 @@ snapshots['test_timeout_in_minutes_0 1'] = '''  - command: cmd
 snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
     timeout_in_minutes: 1
 '''
+
+snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
+'''

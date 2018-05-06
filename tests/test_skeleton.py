@@ -5,7 +5,7 @@ import sys
 import pytest
 import argparse
 from unittest.mock import patch
-from bkyml.skeleton import Comment, Steps, Env, Command, parse_main, run, check_positive, parse_args
+from bkyml.skeleton import Comment, Steps, Env, Command, parse_main, run, check_positive, parse_args, bool_or_string
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -19,6 +19,14 @@ def describe_check_positive():
         with pytest.raises(argparse.ArgumentTypeError) as err:
             check_positive(-1)
         assert '-1 is an invalid positive int value' in str(err.value)
+
+def describe_bool_or_string():
+    def test_bool_or_string_true():
+        assert bool_or_string('TRUE')
+    def test_bool_or_string_false():
+        assert bool_or_string('FALSE') is False
+    def test_bool_or_string():
+        assert bool_or_string('bla') == 'bla'
 
 def describe_comment():
     def test_comment(snapshot):
@@ -70,6 +78,12 @@ def describe_command():
         ns = argparse.Namespace()
         ns.command = [ [ 'cmd' ] ]
         ns.agents = [ ['npm', 'true'], ['mvn', 'true'] ]
+        snapshot.assert_match(Command.command(ns))
+
+    def test_artifact_paths_0(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.artifact_paths = []
         snapshot.assert_match(Command.command(ns))
 
     def test_artifact_paths_1(snapshot):
