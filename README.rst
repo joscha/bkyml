@@ -53,6 +53,13 @@ This allows you to dynamically generate pipelines:
         --label "Run tests for '${test_dir}'"
   done
 
+
+Missing features:
+
+* block step
+* trigger step
+* plugin step (and command step with plugin extension)
+
 Sub-Commands
 ============
 

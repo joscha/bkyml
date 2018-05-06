@@ -7,29 +7,30 @@ import argparse
 import sys
 from unittest.mock import patch
 import pytest
-from bkyml.skeleton import  Comment, \
-                            Steps, \
-                            Env, \
-                            Command, \
-                            parse_main, \
-                            run, \
-                            check_positive, \
-                            bool_or_string
+from bkyml.skeleton import Comment, \
+                           Steps, \
+                           Env, \
+                           Command, \
+                           parse_main, \
+                           run, \
+                           check_positive, \
+                           bool_or_string
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
 def describe_bkyaml():
+
     @pytest.fixture
-    def run_run(capsys, snapshot, args):
-        with patch.object(sys, 'argv', [''] + args):
+    def run_run(capsys, snapshot, argv):
+        with patch.object(sys, 'argv', [''] + argv):
             run()
         captured = capsys.readouterr()
         snapshot.assert_match(captured.out)
 
     @pytest.fixture
-    def namespace():
+    def args():
         return argparse.Namespace()
 
     def describe_check_positive():
@@ -44,30 +45,32 @@ def describe_bkyaml():
     def describe_bool_or_string():
         def test_bool_or_string_true():
             assert bool_or_string('TRUE')
+
         def test_bool_or_string_false():
             assert bool_or_string('FALSE') is False
+
         def test_bool_or_string():
             assert bool_or_string('bla') == 'bla'
 
     def describe_comment():
-        def test_comment(namespace, snapshot):
-            namespace.str = ['a', 'b']
-            snapshot.assert_match(Comment.comment(namespace))
+        def test_comment(args, snapshot):
+            args.str = ['a', 'b']
+            snapshot.assert_match(Comment.comment(args))
 
     def describe_steps():
-        def test_steps(namespace, snapshot):
-            snapshot.assert_match(Steps.steps(namespace))
+        def test_steps(args, snapshot):
+            snapshot.assert_match(Steps.steps(args))
 
     def describe_env():
-        def test_env_all(namespace, snapshot):
-            namespace.var = [['a', 'b'], ['c', 'd']]
-            snapshot.assert_match(Env.env(namespace))
+        def test_env_all(args, snapshot):
+            args.var = [['a', 'b'], ['c', 'd']]
+            snapshot.assert_match(Env.env(args))
 
     def describe_command():
         @pytest.fixture
-        def generic_command_call(namespace, snapshot):
-            namespace.command = [['cmd']]
-            snapshot.assert_match(Command.command(namespace))
+        def generic_command_call(args, snapshot):
+            args.command = [['cmd']]
+            snapshot.assert_match(Command.command(args))
 
         @pytest.fixture
         def assert_command_call_error(capsys, command_args, message):
@@ -77,54 +80,54 @@ def describe_bkyaml():
             captured = capsys.readouterr()
             assert message in captured.err
 
-        def test_command_1(namespace, snapshot):
-            namespace.command = [["my-command arg1 'arg 2'"]]
-            snapshot.assert_match(Command.command(namespace))
+        def test_command_1(args, snapshot):
+            args.command = [["my-command arg1 'arg 2'"]]
+            snapshot.assert_match(Command.command(args))
 
-        def test_command_n(namespace, snapshot):
-            namespace.command = [['a', 'b'], ['c', 'd']]
-            snapshot.assert_match(Command.command(namespace))
+        def test_command_n(args, snapshot):
+            args.command = [['a', 'b'], ['c', 'd']]
+            snapshot.assert_match(Command.command(args))
 
-        def test_label(namespace, snapshot):
-            namespace.label = 'My label'
-            generic_command_call(namespace, snapshot)
+        def test_label(args, snapshot):
+            args.label = 'My label'
+            generic_command_call(args, snapshot)
 
-        def test_branches(namespace, snapshot):
-            namespace.branches = ['master', 'release-*']
-            generic_command_call(namespace, snapshot)
+        def test_branches(args, snapshot):
+            args.branches = ['master', 'release-*']
+            generic_command_call(args, snapshot)
 
-        def test_env(namespace, snapshot):
-            namespace.env = [['a', 'b'], ['c', 'd']]
-            generic_command_call(namespace, snapshot)
+        def test_env(args, snapshot):
+            args.env = [['a', 'b'], ['c', 'd']]
+            generic_command_call(args, snapshot)
 
-        def test_agents(namespace, snapshot):
-            namespace.agents = [['npm', 'true'], ['mvn', 'true']]
-            generic_command_call(namespace, snapshot)
+        def test_agents(args, snapshot):
+            args.agents = [['npm', 'true'], ['mvn', 'true']]
+            generic_command_call(args, snapshot)
 
-        def test_artifact_paths_0(namespace, snapshot):
-            namespace.artifact_paths = []
-            generic_command_call(namespace, snapshot)
+        def test_artifact_paths_0(args, snapshot):
+            args.artifact_paths = []
+            generic_command_call(args, snapshot)
 
-        def test_artifact_paths_1(namespace, snapshot):
-            namespace.artifact_paths = [["logs/**/*;coverage/**/*"]]
-            generic_command_call(namespace, snapshot)
+        def test_artifact_paths_1(args, snapshot):
+            args.artifact_paths = [["logs/**/*;coverage/**/*"]]
+            generic_command_call(args, snapshot)
 
-        def test_artifact_paths_n(namespace, snapshot):
-            namespace.artifact_paths = [["logs/**/*", "coverage/**/*"]]
-            generic_command_call(namespace, snapshot)
+        def test_artifact_paths_n(args, snapshot):
+            args.artifact_paths = [["logs/**/*", "coverage/**/*"]]
+            generic_command_call(args, snapshot)
 
-        def test_parallelism(namespace, snapshot):
-            namespace.parallelism = 4
-            generic_command_call(namespace, snapshot)
+        def test_parallelism(args, snapshot):
+            args.parallelism = 4
+            generic_command_call(args, snapshot)
 
-        def test_parallelism_1(namespace, snapshot):
-            namespace.parallelism = 1
-            generic_command_call(namespace, snapshot)
+        def test_parallelism_1(args, snapshot):
+            args.parallelism = 1
+            generic_command_call(args, snapshot)
 
-        def test_concurrency(namespace, snapshot):
-            namespace.concurrency = 2
-            namespace.concurrency_group = 'my/group'
-            generic_command_call(namespace, snapshot)
+        def test_concurrency(args, snapshot):
+            args.concurrency = 2
+            args.concurrency_group = 'my/group'
+            generic_command_call(args, snapshot)
 
         def test_concurrency_cli(capsys):
             assert_command_call_error(
@@ -133,61 +136,61 @@ def describe_bkyaml():
                 '--concurrency requires --concurrency-group'
             )
 
-        def test_timeout_in_minutes_minus(namespace, snapshot):
-            namespace.timeout_in_minutes = -1
-            generic_command_call(namespace, snapshot)
+        def test_timeout_in_minutes_minus(args, snapshot):
+            args.timeout_in_minutes = -1
+            generic_command_call(args, snapshot)
 
-        def test_timeout_in_minutes_0(namespace, snapshot):
-            namespace.timeout_in_minutes = 0
-            generic_command_call(namespace, snapshot)
+        def test_timeout_in_minutes_0(args, snapshot):
+            args.timeout_in_minutes = 0
+            generic_command_call(args, snapshot)
 
-        def test_timeout_in_minutes_1(namespace, snapshot):
-            namespace.timeout_in_minutes = 1
-            generic_command_call(namespace, snapshot)
+        def test_timeout_in_minutes_1(args, snapshot):
+            args.timeout_in_minutes = 1
+            generic_command_call(args, snapshot)
 
-        def test_skip_bool_true(namespace, snapshot):
-            namespace.skip = True
-            generic_command_call(namespace, snapshot)
+        def test_skip_bool_true(args, snapshot):
+            args.skip = True
+            generic_command_call(args, snapshot)
 
-        def test_skip_bool_false(namespace, snapshot):
-            namespace.skip = False
-            generic_command_call(namespace, snapshot)
+        def test_skip_bool_false(args, snapshot):
+            args.skip = False
+            generic_command_call(args, snapshot)
 
-        def test_skip_string(namespace, snapshot):
-            namespace.skip = 'Some reason'
-            generic_command_call(namespace, snapshot)
+        def test_skip_string(args, snapshot):
+            args.skip = 'Some reason'
+            generic_command_call(args, snapshot)
 
         def describe_retry():
-            def test_retry_unknown(namespace, snapshot):
-                namespace.retry = 'unknown'
+            def test_retry_unknown(args, snapshot):
+                args.retry = 'unknown'
                 with pytest.raises(argparse.ArgumentTypeError) as err:
-                    generic_command_call(namespace, snapshot)
+                    generic_command_call(args, snapshot)
                 assert 'unknown is an invalid retry value' in str(err.value)
 
             def describe_manual():
-                def test_retry_manual(namespace, snapshot):
-                    namespace.retry = 'manual'
-                    generic_command_call(namespace, snapshot)
+                def test_retry_manual(args, snapshot):
+                    args.retry = 'manual'
+                    generic_command_call(args, snapshot)
 
-                def test_retry_manual_allowed(namespace, snapshot):
-                    namespace.retry = 'manual'
-                    namespace.retry_manual_allowed = True
-                    generic_command_call(namespace, snapshot)
-                    namespace.retry_manual_allowed = False
-                    generic_command_call(namespace, snapshot)
+                def test_retry_manual_allowed(args, snapshot):
+                    args.retry = 'manual'
+                    args.retry_manual_allowed = True
+                    generic_command_call(args, snapshot)
+                    args.retry_manual_allowed = False
+                    generic_command_call(args, snapshot)
 
-                def test_retry_reason(namespace, snapshot):
-                    namespace.retry = 'manual'
-                    namespace.retry_manual_reason = 'Some reason why'
-                    generic_command_call(namespace, snapshot)
+                def test_retry_reason(args, snapshot):
+                    args.retry = 'manual'
+                    args.retry_manual_reason = 'Some reason why'
+                    generic_command_call(args, snapshot)
 
                 # pylint: disable=invalid-name
-                def test_retry_manual_permit_on_passed(namespace, snapshot):
-                    namespace.retry = 'manual'
-                    namespace.retry_manual_permit_on_passed = True
-                    generic_command_call(namespace, snapshot)
-                    namespace.retry_manual_permit_on_passed = False
-                    generic_command_call(namespace, snapshot)
+                def test_retry_manual_permit_on_passed(args, snapshot):
+                    args.retry = 'manual'
+                    args.retry_manual_permit_on_passed = True
+                    generic_command_call(args, snapshot)
+                    args.retry_manual_permit_on_passed = False
+                    generic_command_call(args, snapshot)
 
                 def test_retry_manual_cli_missing_allowed_missing_retry(capsys):
                     assert_command_call_error(
@@ -223,45 +226,45 @@ def describe_bkyaml():
                     )
 
             def describe_automatic():
-                def test_retry_automatic(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic(args, snapshot):
+                    args.retry = 'automatic'
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_limit(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_limit = 2
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_limit(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_limit = 2
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_limit_11(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_limit = 11
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_limit_11(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_limit = 11
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_exit_status_star(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_exit_status = '*'
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_exit_status_star(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_exit_status = '*'
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_exit_status_number(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_exit_status = 1
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_exit_status_number(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_exit_status = 1
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_exit_status_and_limit(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_limit = 2
-                    namespace.retry_automatic_exit_status = 1
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_exit_status_and_limit(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_limit = 2
+                    args.retry_automatic_exit_status = 1
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_tuple_0(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_tuple = []
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_tuple_0(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_tuple = []
+                    generic_command_call(args, snapshot)
 
-                def test_retry_automatic_tuple_n(namespace, snapshot):
-                    namespace.retry = 'automatic'
-                    namespace.retry_automatic_tuple = [['*', 2], [1, 3]]
-                    generic_command_call(namespace, snapshot)
+                def test_retry_automatic_tuple_n(args, snapshot):
+                    args.retry = 'automatic'
+                    args.retry_automatic_tuple = [['*', 2], [1, 3]]
+                    generic_command_call(args, snapshot)
 
                 def test_retry_automatic_cli_exit_status_string(capsys):
                     assert_command_call_error(
