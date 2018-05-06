@@ -7,95 +7,7 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_steps 1'] = 'steps:'
-
 snapshots['test_comment 1'] = '# a b'
-
-snapshots['test_skip_bool_false 1'] = '''  - command: cmd
-'''
-
-snapshots['test_skip_string 1'] = '''  - command: cmd
-    skip: Some reason
-'''
-
-snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
-'''
-
-snapshots['test_command_n 1'] = '''  - command:
-      - a
-      - b
-      - c
-      - d
-'''
-
-snapshots['test_label 1'] = '''  - label: My label
-    command: cmd
-'''
-
-snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
-    artifact_paths: logs/**/*;coverage/**/*
-'''
-
-snapshots['test_artifact_paths_n 1'] = '''  - command: cmd
-    artifact_paths:
-      - logs/**/*
-      - coverage/**/*
-'''
-
-snapshots['test_parallelism 1'] = '''  - command: cmd
-    parallelism: 4
-'''
-
-snapshots['test_parallelism_1 1'] = '''  - command: cmd
-'''
-
-snapshots['test_concurrency 1'] = '''  - command: cmd
-    concurrency: 2
-    concurrency_group: my/group
-'''
-
-snapshots['test_timeout_in_minutes_minus 1'] = '''  - command: cmd
-'''
-
-snapshots['test_timeout_in_minutes_0 1'] = '''  - command: cmd
-'''
-
-snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
-    timeout_in_minutes: 1
-'''
-
-snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
-'''
-
-snapshots['test_branches 1'] = '''  - command: cmd
-    branches: master release-*
-'''
-
-snapshots['test_skip_bool_true 1'] = '''  - command: cmd
-    skip: true
-'''
-
-snapshots['test_retry_manual 1'] = '''  - command: cmd
-    retry:
-      manual: true
-'''
-
-snapshots['test_env_all 1'] = '''env:
-  a: b
-  c: d
-'''
-
-snapshots['test_env 1'] = '''  - command: cmd
-    env:
-      a: b
-      c: d
-'''
-
-snapshots['test_agents 1'] = '''  - command: cmd
-    agents:
-      npm: 'true'
-      mvn: 'true'
-'''
 
 snapshots['test_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
 
@@ -191,6 +103,17 @@ optional arguments:
                         This job can not be retried after it has passed.
 '''
 
+snapshots['test_empty_command 1'] = ''
+
+snapshots['test_steps 1'] = 'steps:'
+
+snapshots['test_command 1'] = '''  - command: x
+
+'''
+
+snapshots['test_main 1'] = '''  - command: x
+'''
+
 snapshots['test_retry_automatic 1'] = '''  - command: cmd
     retry:
       automatic: true
@@ -241,6 +164,11 @@ snapshots['test_retry_automatic_tuple_n 1'] = '''  - command: cmd
           limit: 3
 '''
 
+snapshots['test_retry_manual 1'] = '''  - command: cmd
+    retry:
+      manual: true
+'''
+
 snapshots['test_retry_manual_allowed 1'] = '''  - command: cmd
     retry:
       manual: true
@@ -269,18 +197,90 @@ snapshots['test_retry_manual_permit_on_passed 2'] = '''  - command: cmd
       manual: true
 '''
 
-snapshots['test_no_command 1'] = ''
-
-snapshots['test_main 1'] = '''  - command: x
-'''
-
-snapshots['test_command 1'] = '''  - command: x
-
-'''
-
 snapshots['test_retry_manual_cli_permit_on_passed_manual_retry 1'] = '''  - command: cmd
     retry:
       manual:
         permit_on_passed: true
 
+'''
+
+snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
+'''
+
+snapshots['test_command_n 1'] = '''  - command:
+      - a
+      - b
+      - c
+      - d
+'''
+
+snapshots['test_label 1'] = '''  - label: My label
+    command: cmd
+'''
+
+snapshots['test_branches 1'] = '''  - command: cmd
+    branches: master release-*
+'''
+
+snapshots['test_env 1'] = '''  - command: cmd
+    env:
+      a: b
+      c: d
+'''
+
+snapshots['test_agents 1'] = '''  - command: cmd
+    agents:
+      npm: 'true'
+      mvn: 'true'
+'''
+
+snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
+'''
+
+snapshots['test_artifact_paths_1 1'] = '''  - command: cmd
+    artifact_paths: logs/**/*;coverage/**/*
+'''
+
+snapshots['test_artifact_paths_n 1'] = '''  - command: cmd
+    artifact_paths:
+      - logs/**/*
+      - coverage/**/*
+'''
+
+snapshots['test_parallelism 1'] = '''  - command: cmd
+    parallelism: 4
+'''
+
+snapshots['test_parallelism_1 1'] = '''  - command: cmd
+'''
+
+snapshots['test_concurrency 1'] = '''  - command: cmd
+    concurrency: 2
+    concurrency_group: my/group
+'''
+
+snapshots['test_timeout_in_minutes_minus 1'] = '''  - command: cmd
+'''
+
+snapshots['test_timeout_in_minutes_0 1'] = '''  - command: cmd
+'''
+
+snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
+    timeout_in_minutes: 1
+'''
+
+snapshots['test_skip_bool_true 1'] = '''  - command: cmd
+    skip: true
+'''
+
+snapshots['test_skip_bool_false 1'] = '''  - command: cmd
+'''
+
+snapshots['test_skip_string 1'] = '''  - command: cmd
+    skip: Some reason
+'''
+
+snapshots['test_env_all 1'] = '''env:
+  a: b
+  c: d
 '''

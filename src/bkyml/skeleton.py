@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+    Module to produce valid YAML for Buildkite
+    see https://buildkite.com/docs/pipelines/defining-steps
+'''
 from __future__ import division, print_function, absolute_import
 
 import argparse
 import sys
 import logging
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML as RuamelYaml
 from ruamel.yaml.compat import StringIO
 
 from bkyml import __version__
@@ -14,19 +18,19 @@ __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
-_logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
-class MyYAML(YAML):
-    def dump(self, data, stream=None, **kw):
+class MyYAML(RuamelYaml):
+    def to_string(self, data):
         stream = StringIO()
-        YAML.dump(self, data, stream, **kw)
+        RuamelYaml.dump(self, data, stream)
         return stream.getvalue()
 
-yaml = MyYAML()
-yaml.default_flow_style = False
+YAML = MyYAML()
+YAML.default_flow_style = False
 
-retry_manual_allowed_default = True
-retry_manual_permit_on_passed_default = False
+RETRY_MANUAL_ALLOWED_DEFAULT = True
+RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT = False
 
 def check_positive(value):
     ivalue = int(value)
@@ -88,6 +92,7 @@ class Steps:
         parser.set_defaults(func=Steps.steps)
 
     @staticmethod
+    # pylint: disable=unused-argument
     def steps(namespace):
         return "steps:"
 
@@ -108,7 +113,7 @@ class Env:
 
     @staticmethod
     def env(namespace):
-        return yaml.dump({
+        return YAML.to_string({
             'env': tuples_to_dict(namespace.var),
         })
 
@@ -229,7 +234,7 @@ class Command:
             dest="retry_manual_allowed",
             action='store_false'
         )
-        parser.set_defaults(retry_manual_allowed=retry_manual_allowed_default)
+        parser.set_defaults(retry_manual_allowed=RETRY_MANUAL_ALLOWED_DEFAULT)
         parser.add_argument(
             '--retry-manual-reason',
             help="A string that will be displayed in a tooltip on the Retry button in Buildkite.",
@@ -248,7 +253,7 @@ class Command:
             dest="retry_manual_permit_on_passed",
             action='store_false'
         )
-        parser.set_defaults(retry_manual_permit_on_passed=retry_manual_permit_on_passed_default)
+        parser.set_defaults(retry_manual_permit_on_passed=RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT)
 
         parser.set_defaults(func=Command.command)
 
@@ -274,10 +279,10 @@ class Command:
             parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.')
 
         if not ns_hasattr(parsed, 'retry') or (ns_hasattr(parsed, 'retry') and parsed.retry != 'manual'):
-            if ns_hasattr(parsed, 'retry_manual_allowed') and parsed.retry_manual_allowed is not retry_manual_allowed_default:
+            if ns_hasattr(parsed, 'retry_manual_allowed') and parsed.retry_manual_allowed is not RETRY_MANUAL_ALLOWED_DEFAULT:
                 parser.error('--[no-]retry-manual-allowed requires --retry manual.')
 
-            if ns_hasattr(parsed, 'retry_manual_permit_on_passed') and parsed.retry_manual_permit_on_passed is not retry_manual_permit_on_passed_default:
+            if ns_hasattr(parsed, 'retry_manual_permit_on_passed') and parsed.retry_manual_permit_on_passed is not RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT:
                 parser.error('--[no-]retry-manual-permit-on-passed requires --retry manual.')
 
             if ns_hasattr(parsed, 'retry_manual_reason'):
@@ -332,7 +337,7 @@ class Command:
             step['timeout_in_minutes'] = namespace.timeout_in_minutes
 
         # skip
-        if ns_hasattr(namespace, 'skip') and (namespace.skip is True or type(namespace.skip) is str):
+        if ns_hasattr(namespace, 'skip') and (namespace.skip is True or isinstance(namespace.skip, str)):
             step['skip'] = namespace.skip
 
         # retry
@@ -367,8 +372,8 @@ class Command:
                 retry[namespace.retry] = True
             step['retry'] = retry
 
-        yaml.indent(sequence=4, offset=2)
-        return yaml.dump([step])
+        YAML.indent(sequence=4, offset=2)
+        return YAML.to_string([step])
 
 def parse_args(args):
     """Parse command line parameters
@@ -438,10 +443,10 @@ def main(args):
       args ([str]): command line parameter list
     """
     ret = parse_main(args)
-    _logger.debug("Calling function")
+    LOGGER.debug("Calling function")
     if ret is not None:
         print(ret)
-    _logger.info("Script ends here")
+    LOGGER.info("Script ends here")
 
 def run():
     """Entry point for console_scripts
