@@ -163,3 +163,11 @@ There is also:
   --retry-automatic-exit-code
 
 which can't be used in conjunction with --retry-automatic-tuple
+
+And:
+
+  --retry-manual-allowed (allowing manual retries, default)
+  --no-retry-manual-allowed (disallowing manual retries)
+  --retry-manual-reason REASON (giving a reason why retries are forbidden)
+  --retry-manual-permit-on-passed (allowing retries after the job has passed)
+  --no-retry-manual-permit-on-passed (disallowing retries after the job has passed, default)

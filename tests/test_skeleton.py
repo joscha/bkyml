@@ -12,6 +12,13 @@ __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
+@pytest.fixture
+def run_run(capsys, snapshot, args):
+    with patch.object(sys, 'argv', [''] + args):
+        run()
+    captured = capsys.readouterr()
+    snapshot.assert_match(captured.out)
+
 def describe_check_positive():
     def test_check_positive_1():
         assert check_positive(1)
@@ -145,105 +152,153 @@ def describe_command():
         ns.skip = 'Some reason'
         generic_command_call(ns, snapshot)
 
-    def test_retry_manual(ns, snapshot):
-        ns.retry = 'manual'
-        generic_command_call(ns, snapshot)
+    def describe_retry():
+        def test_retry_unknown(ns, snapshot):
+            ns.retry = 'unknown'
+            with pytest.raises(argparse.ArgumentTypeError) as err:
+                generic_command_call(ns, snapshot)
+            assert 'unknown is an invalid retry value' in str(err.value)
 
-    def test_retry_automatic(ns, snapshot):
-        ns.retry = 'automatic'
-        generic_command_call(ns, snapshot)
+        def describe_manual():
+            def test_retry_manual(ns, snapshot):
+                ns.retry = 'manual'
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_limit(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_limit = 2
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_allowed(ns, snapshot):
+                ns.retry = 'manual'
+                ns.retry_manual_allowed = True
+                generic_command_call(ns, snapshot)
+                ns.retry_manual_allowed = False
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_limit_11(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_limit = 11
-        generic_command_call(ns, snapshot)
+            def test_retry_reason(ns, snapshot):
+                ns.retry = 'manual'
+                ns.retry_manual_reason = 'Some reason why'
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_exit_status_star(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_exit_status = '*'
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_permit_on_passed(ns, snapshot):
+                ns.retry = 'manual'
+                ns.retry_manual_permit_on_passed = True
+                generic_command_call(ns, snapshot)
+                ns.retry_manual_permit_on_passed = False
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_exit_status_number(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_exit_status = 1
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_cli_no_allowed_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--no-retry-manual-allowed'],
+                    '--[no-]retry-manual-allowed requires --retry manual'
+                )
 
-    def test_retry_automatic_exit_status_and_limit(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_limit = 2
-        ns.retry_automatic_exit_status = 1
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_cli_reason_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry-manual-reason', 'My reason'],
+                    '--retry-manual-reason requires --retry manual'
+                )
 
-    def test_retry_automatic_tuple_0(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_tuple = []
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_cli_permit_on_passed_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry-manual-permit-on-passed'],
+                    '--[no-]retry-manual-permit-on-passed requires --retry manual'
+                )
 
-    def test_retry_automatic_tuple_n(ns, snapshot):
-        ns.retry = 'automatic'
-        ns.retry_automatic_tuple = [['*', 2], [ 1, 3 ]]
-        generic_command_call(ns, snapshot)
+            def test_retry_manual_cli_permit_on_passed_manual_retry(capsys, snapshot):
+                run_run(
+                    capsys,
+                    snapshot,
+                    ['command', '--command', 'cmd', '--retry', 'manual', '--retry-manual-permit-on-passed']
+                )
 
-    def test_retry_automatic_cli_exit_status_string(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'],
-            'xxx is an invalid value'
-        )
+        def describe_automatic():
+            def test_retry_automatic(ns, snapshot):
+                ns.retry = 'automatic'
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_cli_exit_status_no_retry(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry-automatic-exit-status', '*'],
-            '--retry-automatic-exit-status requires --retry automatic'
-        )
+            def test_retry_automatic_limit(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_limit = 2
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_cli_limit_no_retry(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry-automatic-limit', '2'],
-            '--retry-automatic-limit requires --retry automatic'
-        )
+            def test_retry_automatic_limit_11(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_limit = 11
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_cli_tuple_no_retry(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry-automatic-tuple', '*', '2'],
-            '--retry-automatic-tuple requires --retry automatic'
-        )
+            def test_retry_automatic_exit_status_star(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_exit_status = '*'
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_cli_tuple_no_combine_exit_status(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-exit-status', '*'],
-            '--retry-automatic-tuple can not be combined with --retry-automatic-exit-status'
-        )
+            def test_retry_automatic_exit_status_number(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_exit_status = 1
+                generic_command_call(ns, snapshot)
 
-    def test_retry_automatic_cli_tuple_no_combine_limit(capsys):
-        assert_command_call_error(
-            capsys,
-            ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-limit', '2'],
-            '--retry-automatic-tuple can not be combined with --retry-automatic-limit'
-        )
+            def test_retry_automatic_exit_status_and_limit(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_limit = 2
+                ns.retry_automatic_exit_status = 1
+                generic_command_call(ns, snapshot)
+
+            def test_retry_automatic_tuple_0(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_tuple = []
+                generic_command_call(ns, snapshot)
+
+            def test_retry_automatic_tuple_n(ns, snapshot):
+                ns.retry = 'automatic'
+                ns.retry_automatic_tuple = [['*', 2], [ 1, 3 ]]
+                generic_command_call(ns, snapshot)
+
+            def test_retry_automatic_cli_exit_status_string(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'],
+                    'xxx is an invalid value'
+                )
+
+            def test_retry_automatic_cli_exit_status_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry-automatic-exit-status', '*'],
+                    '--retry-automatic-exit-status requires --retry automatic'
+                )
+
+            def test_retry_automatic_cli_limit_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry-automatic-limit', '2'],
+                    '--retry-automatic-limit requires --retry automatic'
+                )
+
+            def test_retry_automatic_cli_tuple_no_retry(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry-automatic-tuple', '*', '2'],
+                    '--retry-automatic-tuple requires --retry automatic'
+                )
+
+            def test_retry_automatic_cli_tuple_no_combine_exit_status(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-exit-status', '*'],
+                    '--retry-automatic-tuple can not be combined with --retry-automatic-exit-status'
+                )
+
+            def test_retry_automatic_cli_tuple_no_combine_limit(capsys):
+                assert_command_call_error(
+                    capsys,
+                    ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-limit', '2'],
+                    '--retry-automatic-tuple can not be combined with --retry-automatic-limit'
+                )
 
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
 def describe_cli():
-
-    @pytest.fixture
-    def run_run(capsys, snapshot, args):
-        with patch.object(sys, 'argv', [''] + args):
-            run()
-        captured = capsys.readouterr()
-        snapshot.assert_match(captured.out)
-
     def test_command(snapshot, capsys):
         run_run(capsys, snapshot, ['command', '--command', 'x'])
 

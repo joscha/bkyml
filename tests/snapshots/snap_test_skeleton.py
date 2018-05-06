@@ -11,15 +11,6 @@ snapshots['test_steps 1'] = 'steps:'
 
 snapshots['test_comment 1'] = '# a b'
 
-snapshots['test_main 1'] = '''  - command: x
-'''
-
-snapshots['test_command 1'] = '''  - command: x
-
-'''
-
-snapshots['test_no_command 1'] = ''
-
 snapshots['test_skip_bool_false 1'] = '''  - command: cmd
 '''
 
@@ -74,56 +65,6 @@ snapshots['test_timeout_in_minutes_1 1'] = '''  - command: cmd
 '''
 
 snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
-'''
-
-snapshots['test_retry_automatic 1'] = '''  - command: cmd
-    retry:
-      automatic: true
-'''
-
-snapshots['test_retry_automatic_limit 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        limit: 2
-'''
-
-snapshots['test_retry_automatic_limit_11 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        limit: 10
-'''
-
-snapshots['test_retry_automatic_exit_status_star 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        exit_status: '*'
-'''
-
-snapshots['test_retry_automatic_exit_status_number 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        exit_status: 1
-'''
-
-snapshots['test_retry_automatic_exit_status_and_limit 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        exit_status: 1
-        limit: 2
-'''
-
-snapshots['test_retry_automatic_tuple_0 1'] = '''  - command: cmd
-    retry:
-      automatic: true
-'''
-
-snapshots['test_retry_automatic_tuple_n 1'] = '''  - command: cmd
-    retry:
-      automatic:
-        - exit_status: '*'
-          limit: 2
-        - exit_status: 1
-          limit: 3
 '''
 
 snapshots['test_branches 1'] = '''  - command: cmd
@@ -189,6 +130,10 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--retry-automatic-exit-status INT_OR_STAR]
                 [--retry-automatic-limit POSITIVE_INT]
                 [--retry-automatic-tuple INT_OR_STAR POSITIVE_INT]
+                [--retry-manual-allowed] [--no-retry-manual-allowed]
+                [--retry-manual-reason REASON]
+                [--retry-manual-permit-on-passed]
+                [--no-retry-manual-permit-on-passed]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -233,4 +178,109 @@ optional arguments:
   --retry-automatic-tuple INT_OR_STAR POSITIVE_INT
                         The exit status number that will cause this job to
                         retry and a limit to go with it.
+  --retry-manual-allowed
+                        This job can be retried manually.
+  --no-retry-manual-allowed
+                        This job can not be retried manually.
+  --retry-manual-reason REASON
+                        A string that will be displayed in a tooltip on the
+                        Retry button in Buildkite.
+  --retry-manual-permit-on-passed
+                        This job can be retried after it has passed.
+  --no-retry-manual-permit-on-passed
+                        This job can not be retried after it has passed.
+'''
+
+snapshots['test_retry_automatic 1'] = '''  - command: cmd
+    retry:
+      automatic: true
+'''
+
+snapshots['test_retry_automatic_limit 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        limit: 2
+'''
+
+snapshots['test_retry_automatic_limit_11 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        limit: 10
+'''
+
+snapshots['test_retry_automatic_exit_status_star 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: '*'
+'''
+
+snapshots['test_retry_automatic_exit_status_number 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: 1
+'''
+
+snapshots['test_retry_automatic_exit_status_and_limit 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: 1
+        limit: 2
+'''
+
+snapshots['test_retry_automatic_tuple_0 1'] = '''  - command: cmd
+    retry:
+      automatic: true
+'''
+
+snapshots['test_retry_automatic_tuple_n 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        - exit_status: '*'
+          limit: 2
+        - exit_status: 1
+          limit: 3
+'''
+
+snapshots['test_retry_manual_allowed 1'] = '''  - command: cmd
+    retry:
+      manual: true
+'''
+
+snapshots['test_retry_manual_allowed 2'] = '''  - command: cmd
+    retry:
+      manual:
+        allowed: false
+'''
+
+snapshots['test_retry_reason 1'] = '''  - command: cmd
+    retry:
+      manual:
+        reason: Some reason why
+'''
+
+snapshots['test_retry_manual_permit_on_passed 1'] = '''  - command: cmd
+    retry:
+      manual:
+        permit_on_passed: true
+'''
+
+snapshots['test_retry_manual_permit_on_passed 2'] = '''  - command: cmd
+    retry:
+      manual: true
+'''
+
+snapshots['test_no_command 1'] = ''
+
+snapshots['test_main 1'] = '''  - command: x
+'''
+
+snapshots['test_command 1'] = '''  - command: x
+
+'''
+
+snapshots['test_retry_manual_cli_permit_on_passed_manual_retry 1'] = '''  - command: cmd
+    retry:
+      manual:
+        permit_on_passed: true
+
 '''

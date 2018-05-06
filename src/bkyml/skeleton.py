@@ -25,6 +25,9 @@ class MyYAML(YAML):
 yaml = MyYAML()
 yaml.default_flow_style = False
 
+retry_manual_allowed_default = True
+retry_manual_permit_on_passed_default = False
+
 def check_positive(value):
     ivalue = int(value)
     if ivalue <= 0:
@@ -214,6 +217,38 @@ class Command:
             action='append',
             metavar=('INT_OR_STAR', 'POSITIVE_INT')
         )
+        parser.add_argument(
+            '--retry-manual-allowed',
+            help="This job can be retried manually.",
+            dest="retry_manual_allowed",
+            action='store_true'
+        )
+        parser.add_argument(
+            '--no-retry-manual-allowed',
+            help="This job can not be retried manually.",
+            dest="retry_manual_allowed",
+            action='store_false'
+        )
+        parser.set_defaults(retry_manual_allowed=retry_manual_allowed_default)
+        parser.add_argument(
+            '--retry-manual-reason',
+            help="A string that will be displayed in a tooltip on the Retry button in Buildkite.",
+            type=str,
+            metavar='REASON'
+        )
+        parser.add_argument(
+            '--retry-manual-permit-on-passed',
+            help="This job can be retried after it has passed.",
+            dest="retry_manual_permit_on_passed",
+            action='store_true'
+        )
+        parser.add_argument(
+            '--no-retry-manual-permit-on-passed',
+            help="This job can not be retried after it has passed.",
+            dest="retry_manual_permit_on_passed",
+            action='store_false'
+        )
+        parser.set_defaults(retry_manual_permit_on_passed=retry_manual_permit_on_passed_default)
 
         parser.set_defaults(func=Command.command)
 
@@ -222,20 +257,31 @@ class Command:
         if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
             parser.error("--concurrency requires --concurrency-group.")
 
-        if ns_hasattr(parsed, 'retry_automatic_exit_status') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
-            parser.error('--retry-automatic-exit-status requires --retry automatic.')
+        if not ns_hasattr(parsed, 'retry') or (ns_hasattr(parsed, 'retry') and parsed.retry != 'automatic'):
+            if ns_hasattr(parsed, 'retry_automatic_exit_status'):
+                parser.error('--retry-automatic-exit-status requires --retry automatic.')
 
-        if ns_hasattr(parsed, 'retry_automatic_limit') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
-            parser.error('--retry-automatic-limit requires --retry automatic.')
+            if ns_hasattr(parsed, 'retry_automatic_limit'):
+                parser.error('--retry-automatic-limit requires --retry automatic.')
 
-        if ns_hasattr(parsed, 'retry_automatic_tuple') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
-            parser.error('--retry-automatic-tuple requires --retry automatic.')
+            if ns_hasattr(parsed, 'retry_automatic_tuple'):
+                parser.error('--retry-automatic-tuple requires --retry automatic.')
 
         if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_exit_status'):
             parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.')
 
         if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_limit'):
             parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.')
+
+        if not ns_hasattr(parsed, 'retry') or (ns_hasattr(parsed, 'retry') and parsed.retry != 'manual'):
+            if ns_hasattr(parsed, 'retry_manual_allowed') and parsed.retry_manual_allowed is not retry_manual_allowed_default:
+                parser.error('--[no-]retry-manual-allowed requires --retry manual.')
+
+            if ns_hasattr(parsed, 'retry_manual_permit_on_passed') and parsed.retry_manual_permit_on_passed is not retry_manual_permit_on_passed_default:
+                parser.error('--[no-]retry-manual-permit-on-passed requires --retry manual.')
+
+            if ns_hasattr(parsed, 'retry_manual_reason'):
+                parser.error('--retry-manual-reason requires --retry manual.')
 
     @staticmethod
     def command(ns):
@@ -292,9 +338,9 @@ class Command:
         # retry
         if ns_hasattr(ns, 'retry'):
             retry = {}
+            retry[ns.retry] = {}
 
-            if ns_hasattr(ns, 'retry_automatic_exit_status') or ns_hasattr(ns, 'retry_automatic_limit') or ns_hasattr(ns, 'retry_automatic_tuple'):
-                retry[ns.retry] = {}
+            if ns.retry == 'automatic':
                 if ns_hasattr(ns, 'retry_automatic_exit_status'):
                     retry[ns.retry]['exit_status'] = ns.retry_automatic_exit_status
                 if ns_hasattr(ns, 'retry_automatic_limit'):
@@ -307,11 +353,18 @@ class Command:
                                 'exit_status': int_or_star(tpl[0]),
                                 'limit': min(10, check_positive(tpl[1])),
                             })
-                    else:
-                        retry[ns.retry] = True
+            elif ns.retry == 'manual':
+                if ns_hasattr(ns, 'retry_manual_allowed') and not ns.retry_manual_allowed:
+                    retry[ns.retry]['allowed'] = ns.retry_manual_allowed
+                if ns_hasattr(ns, 'retry_manual_reason'):
+                    retry[ns.retry]['reason'] = ns.retry_manual_reason
+                if ns_hasattr(ns, 'retry_manual_permit_on_passed') and ns.retry_manual_permit_on_passed:
+                    retry[ns.retry]['permit_on_passed'] = ns.retry_manual_permit_on_passed
             else:
-                retry[ns.retry] = True
+                raise argparse.ArgumentTypeError("%s is an invalid retry value" % ns.retry)
 
+            if not retry[ns.retry]:
+                retry[ns.retry] = True
             step['retry'] = retry
 
         yaml.indent(sequence=4, offset=2)
