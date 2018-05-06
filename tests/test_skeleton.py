@@ -57,6 +57,14 @@ def describe_command():
         ns.command = [[ 'cmd' ]]
         snapshot.assert_match(Command.command(ns))
 
+    @pytest.fixture
+    def assert_command_call_error(capsys, command_args, message):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'cmd'] + command_args)
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert message in captured.err
+
     def test_command_1(ns, snapshot):
         ns.command = [[ "my-command arg1 'arg 2'" ]]
         snapshot.assert_match(Command.command(ns))
@@ -107,11 +115,11 @@ def describe_command():
         generic_command_call(ns, snapshot)
 
     def test_concurrency_cli(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--concurrency', '1'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--concurrency requires --concurrency-group' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--concurrency', '1'],
+            '--concurrency requires --concurrency-group'
+        )
 
     def test_timeout_in_minutes_minus(ns, snapshot):
         ns.timeout_in_minutes = -1
@@ -182,46 +190,46 @@ def describe_command():
         generic_command_call(ns, snapshot)
 
     def test_retry_automatic_cli_exit_status_string(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert 'xxx is an invalid value' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'],
+            'xxx is an invalid value'
+        )
 
     def test_retry_automatic_cli_exit_status_no_retry(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry-automatic-exit-status', '*'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--retry-automatic-exit-status requires --retry automatic' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry-automatic-exit-status', '*'],
+            '--retry-automatic-exit-status requires --retry automatic'
+        )
 
     def test_retry_automatic_cli_limit_no_retry(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry-automatic-limit', '2'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--retry-automatic-limit requires --retry automatic' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry-automatic-limit', '2'],
+            '--retry-automatic-limit requires --retry automatic'
+        )
 
     def test_retry_automatic_cli_tuple_no_retry(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry-automatic-tuple', '*', '2'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--retry-automatic-tuple requires --retry automatic' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry-automatic-tuple', '*', '2'],
+            '--retry-automatic-tuple requires --retry automatic'
+        )
 
     def test_retry_automatic_cli_tuple_no_combine_exit_status(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-exit-status', '*'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--retry-automatic-tuple can not be combined with --retry-automatic-exit-status' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-exit-status', '*'],
+            '--retry-automatic-tuple can not be combined with --retry-automatic-exit-status'
+        )
 
     def test_retry_automatic_cli_tuple_no_combine_limit(capsys):
-        with pytest.raises(SystemExit) as sys_exit:
-            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-limit', '2'])
-        assert '2' in str(sys_exit.value)
-        captured = capsys.readouterr()
-        assert '--retry-automatic-tuple can not be combined with --retry-automatic-limit' in captured.err
+        assert_command_call_error(
+            capsys,
+            ['--retry', 'automatic', '--retry-automatic-tuple', '*', '2', '--retry-automatic-limit', '2'],
+            '--retry-automatic-tuple can not be combined with --retry-automatic-limit'
+        )
 
 def describe_parse_main():
     def test_main(snapshot):
