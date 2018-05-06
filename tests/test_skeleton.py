@@ -297,8 +297,8 @@ def describe_bkyaml():
                         ['--retry', 'automatic',
                          '--retry-automatic-tuple', '*', '2',
                          '--retry-automatic-exit-status', '*'],
-                        '--retry-automatic-tuple can not be combined with \
-                        --retry-automatic-exit-status'
+                        '--retry-automatic-tuple can not be combined with'
+                        + ' --retry-automatic-exit-status'
                     )
 
                 def test_retry_automatic_cli_tuple_missing_combine_limit(capsys):
