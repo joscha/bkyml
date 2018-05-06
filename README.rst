@@ -122,8 +122,12 @@ Example:
       --artifact-paths 'logs/**/*' 'coverage/**/*' \
       --parallelism 5 \
       --concurrency 2 \
-      --concurrency-group my/group
-
+      --concurrency-group my/group \
+      --timeout-in-minutes 60 \
+      --skip 'Some reason' \
+      --retry automatic \
+      --retry-automatic-tuple '*' 2 \
+      --retry-automatic-tuple 1 3
 
 will produce
 
@@ -144,3 +148,18 @@ will produce
     parallelism: 5
     concurrency: 2
     concurrency_group: my/group
+    timeout_in_minutes: 60
+    skip: Some reason
+    retry:
+      automatic:
+        - exit_status: '*'
+          limit: 2
+        - exit_status: 1
+          limit: 3
+
+There is also:
+
+  --retry-automatic-limit
+  --retry-automatic-exit-code
+
+which can't be used in conjunction with --retry-automatic-tuple

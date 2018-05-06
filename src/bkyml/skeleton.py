@@ -39,6 +39,15 @@ def bool_or_string(value):
     else:
         return value
 
+def int_or_star(value):
+    if value == '*':
+        return value
+    else:
+        try:
+            return int(value)
+        except(ValueError):
+            raise argparse.ArgumentTypeError("%s is an invalid value" % value)
+
 def ns_hasattr(ns, attr):
     return hasattr(ns, attr) and getattr(ns, attr) is not None
 
@@ -158,7 +167,7 @@ class Command:
             '--concurrency',
             help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.",
             type=check_positive,
-            metavar="POSITIVE_NUMBER"
+            metavar="POSITIVE_INT"
         )
         parser.add_argument(
             '--concurrency-group',
@@ -183,6 +192,26 @@ class Command:
             help="The conditions for retrying this step.",
             choices=['automatic', 'manual']
         )
+        parser.add_argument(
+            '--retry-automatic-exit-status',
+            help="The exit status number that will cause this job to retry.",
+            type=int_or_star,
+            metavar='INT_OR_STAR'
+        )
+        parser.add_argument(
+            '--retry-automatic-limit',
+            help="The number of times this job can be retried. The maximum value this can be set to is 10.",
+            type=check_positive,
+            metavar="POSITIVE_INT"
+        )
+        parser.add_argument(
+            '--retry-automatic-tuple',
+            help="The exit status number that will cause this job to retry and a limit to go with it.",
+            type=int_or_star,
+            nargs=2,
+            action='append',
+            metavar=('INT_OR_STAR', 'POSITIVE_INT')
+        )
 
         parser.set_defaults(func=Command.command)
 
@@ -190,6 +219,22 @@ class Command:
     def assert_post_parse(parsed, parser):
         if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
             parser.error("--concurrency requires --concurrency-group.")
+
+        if ns_hasattr(parsed, 'retry_automatic_exit_status') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
+            parser.error('--retry-automatic-exit-status requires --retry automatic.')
+
+        if ns_hasattr(parsed, 'retry_automatic_limit') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
+            parser.error('--retry-automatic-limit requires --retry automatic.')
+
+        if ns_hasattr(parsed, 'retry_automatic_tuple') and not (ns_hasattr(parsed, 'retry') and parsed.retry == 'automatic'):
+            parser.error('--retry-automatic-tuple requires --retry automatic.')
+
+        if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_exit_status'):
+            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.')
+
+        if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_limit'):
+            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.')
+
 
     @staticmethod            
     def command(ns):
@@ -246,7 +291,26 @@ class Command:
         # retry
         if ns_hasattr(ns, 'retry'):
             retry = {}
-            retry[ns.retry] = True
+
+            if ns_hasattr(ns, 'retry_automatic_exit_status') or ns_hasattr(ns, 'retry_automatic_limit') or ns_hasattr(ns, 'retry_automatic_tuple'):
+                retry[ns.retry] = {}
+                if ns_hasattr(ns, 'retry_automatic_exit_status'):
+                    retry[ns.retry]['exit_status'] = ns.retry_automatic_exit_status
+                if ns_hasattr(ns, 'retry_automatic_limit'):
+                    retry[ns.retry]['limit'] = min(10, ns.retry_automatic_limit)
+                if ns_hasattr(ns, 'retry_automatic_tuple'):
+                    if len(ns.retry_automatic_tuple) > 0:
+                        retry[ns.retry] = []
+                        for tuple in ns.retry_automatic_tuple:
+                            retry[ns.retry].append({
+                                'exit_status': int_or_star(tuple[0]),
+                                'limit': min(10, check_positive(tuple[1])),
+                            })
+                    else:
+                        retry[ns.retry] = True
+            else:
+                retry[ns.retry] = True
+
             step['retry'] = retry
 
         yaml.indent(sequence=4, offset=2)

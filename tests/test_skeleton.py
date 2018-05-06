@@ -172,6 +172,63 @@ def describe_command():
         ns.retry = 'automatic'
         snapshot.assert_match(Command.command(ns))
 
+    def test_retry_automatic_limit(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_limit = 2
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_limit_11(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_limit = 11
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_exit_status_star(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_exit_status = '*'
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_exit_status_number(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_exit_status = 1
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_exit_status_and_limit(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_limit = 2
+        ns.retry_automatic_exit_status = 1
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_tuple_0(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_tuple = []
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_tuple_n(snapshot):
+        ns = argparse.Namespace()
+        ns.command = [ [ 'cmd' ] ]
+        ns.retry = 'automatic'
+        ns.retry_automatic_tuple = [ ['*', 2], [ 1, 3 ]]
+        snapshot.assert_match(Command.command(ns))
+
+    def test_retry_automatic_cli_exit_status_string(capsys):
+        with pytest.raises(SystemExit) as sys_exit:
+            parse_main(['command', '--command', 'x', '--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'])
+        assert '2' in str(sys_exit.value)
+        captured = capsys.readouterr()
+        assert 'xxx is an invalid value' in captured.err
+
 def describe_parse_main():
     def test_main(snapshot):
         snapshot.assert_match(parse_main(['command', '--command', 'x']))

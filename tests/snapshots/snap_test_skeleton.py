@@ -46,11 +46,13 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
                 [--env KEY VALUE] [--agents KEY VALUE]
                 [--artifact-paths GLOB_OR_PATH [GLOB_OR_PATH ...]]
-                [--parallelism POSITIVE_NUMBER]
-                [--concurrency POSITIVE_NUMBER]
+                [--parallelism POSITIVE_NUMBER] [--concurrency POSITIVE_INT]
                 [--concurrency-group GROUP_NAME]
                 [--timeout-in-minutes TIMEOUT] [--skip BOOL_OR_STRING]
                 [--retry {automatic,manual}]
+                [--retry-automatic-exit-status INT_OR_STAR]
+                [--retry-automatic-limit POSITIVE_INT]
+                [--retry-automatic-tuple INT_OR_STAR POSITIVE_INT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -70,7 +72,7 @@ optional arguments:
   --parallelism POSITIVE_NUMBER
                         The number of parallel jobs that will be created based
                         on this step.
-  --concurrency POSITIVE_NUMBER
+  --concurrency POSITIVE_INT
                         The maximum number of jobs created from this step that
                         are allowed to run at the same time. Requires
                         --concurrency-group.
@@ -86,6 +88,15 @@ optional arguments:
                         Whether to skip this step or not.
   --retry {automatic,manual}
                         The conditions for retrying this step.
+  --retry-automatic-exit-status INT_OR_STAR
+                        The exit status number that will cause this job to
+                        retry.
+  --retry-automatic-limit POSITIVE_INT
+                        The number of times this job can be retried. The
+                        maximum value this can be set to is 10.
+  --retry-automatic-tuple INT_OR_STAR POSITIVE_INT
+                        The exit status number that will cause this job to
+                        retry and a limit to go with it.
 '''
 
 snapshots['test_env_all 1'] = '''env:
@@ -177,4 +188,49 @@ snapshots['test_retry_manual 1'] = '''  - command: cmd
 snapshots['test_retry_automatic 1'] = '''  - command: cmd
     retry:
       automatic: true
+'''
+
+snapshots['test_retry_automatic_limit 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        limit: 2
+'''
+
+snapshots['test_retry_automatic_limit_11 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        limit: 10
+'''
+
+snapshots['test_retry_automatic_exit_status_star 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: '*'
+'''
+
+snapshots['test_retry_automatic_exit_status_number 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: 1
+'''
+
+snapshots['test_retry_automatic_exit_status_and_limit 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        exit_status: 1
+        limit: 2
+'''
+
+snapshots['test_retry_automatic_tuple_0 1'] = '''  - command: cmd
+    retry:
+      automatic: true
+'''
+
+snapshots['test_retry_automatic_tuple_n 1'] = '''  - command: cmd
+    retry:
+      automatic:
+        - exit_status: '*'
+          limit: 2
+        - exit_status: 1
+          limit: 3
 '''
