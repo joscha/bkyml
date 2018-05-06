@@ -50,7 +50,7 @@ def describe_steps():
 def describe_env():
     def test_env_all(snapshot):
         ns = argparse.Namespace()
-        ns.var = [ ['a', 'b'], ['c', 'd'] ]
+        ns.var = [['a', 'b'], ['c', 'd']]
         snapshot.assert_match(Env.env(ns))
 
 def describe_command():
@@ -61,7 +61,7 @@ def describe_command():
 
     @pytest.fixture
     def generic_command_call(ns, snapshot):
-        ns.command = [[ 'cmd' ]]
+        ns.command = [['cmd']]
         snapshot.assert_match(Command.command(ns))
 
     @pytest.fixture
@@ -73,11 +73,11 @@ def describe_command():
         assert message in captured.err
 
     def test_command_1(ns, snapshot):
-        ns.command = [[ "my-command arg1 'arg 2'" ]]
+        ns.command = [["my-command arg1 'arg 2'"]]
         snapshot.assert_match(Command.command(ns))
 
     def test_command_n(ns, snapshot):
-        ns.command = [ [ 'a', 'b' ], [ 'c', 'd' ] ]
+        ns.command = [['a', 'b'], ['c', 'd']]
         snapshot.assert_match(Command.command(ns))
 
     def test_label(ns, snapshot):
@@ -101,11 +101,11 @@ def describe_command():
         generic_command_call(ns, snapshot)
 
     def test_artifact_paths_1(ns, snapshot):
-        ns.artifact_paths = [[ "logs/**/*;coverage/**/*" ]]
+        ns.artifact_paths = [["logs/**/*;coverage/**/*"]]
         generic_command_call(ns, snapshot)
 
     def test_artifact_paths_n(ns, snapshot):
-        ns.artifact_paths = [[ "logs/**/*", "coverage/**/*" ]]
+        ns.artifact_paths = [["logs/**/*", "coverage/**/*"]]
         generic_command_call(ns, snapshot)
 
     def test_parallelism(ns, snapshot):
@@ -249,7 +249,7 @@ def describe_command():
 
             def test_retry_automatic_tuple_n(ns, snapshot):
                 ns.retry = 'automatic'
-                ns.retry_automatic_tuple = [['*', 2], [ 1, 3 ]]
+                ns.retry_automatic_tuple = [['*', 2], [1, 3]]
                 generic_command_call(ns, snapshot)
 
             def test_retry_automatic_cli_exit_status_string(capsys):
