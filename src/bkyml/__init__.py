@@ -7,5 +7,5 @@ try:
     # pylint: disable=invalid-name
     dist_name = __name__
     __version__ = get_distribution(dist_name).version
-except DistributionNotFound: # pragma: no cover
-    __version__ = 'unknown'  # pragma: no cover
+except DistributionNotFound:  # pragma: no cover
+    __version__ = 'unknown'   # pragma: no cover

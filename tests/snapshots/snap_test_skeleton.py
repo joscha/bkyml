@@ -197,13 +197,6 @@ snapshots['test_retry_manual_permit_on_passed 2'] = '''  - command: cmd
       manual: true
 '''
 
-snapshots['test_retry_manual_cli_permit_on_passed_manual_retry 1'] = '''  - command: cmd
-    retry:
-      manual:
-        permit_on_passed: true
-
-'''
-
 snapshots['test_command_1 1'] = '''  - command: my-command arg1 'arg 2'
 '''
 
@@ -283,4 +276,11 @@ snapshots['test_skip_string 1'] = '''  - command: cmd
 snapshots['test_env_all 1'] = '''env:
   a: b
   c: d
+'''
+
+snapshots['test_retry_manual_pop_manual_retry 1'] = '''  - command: cmd
+    retry:
+      manual:
+        permit_on_passed: true
+
 '''

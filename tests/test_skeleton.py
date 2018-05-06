@@ -20,6 +20,7 @@ __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
 __license__ = "mit"
 
+
 def describe_bkyaml():
 
     @pytest.fixture
@@ -192,14 +193,14 @@ def describe_bkyaml():
                     args.retry_manual_permit_on_passed = False
                     generic_command_call(args, snapshot)
 
-                def test_retry_manual_cli_missing_allowed_missing_retry(capsys):
+                def test_retry_manual_missing_allowed_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--no-retry-manual-allowed'],
                         '--[no-]retry-manual-allowed requires --retry manual'
                     )
 
-                def test_retry_manual_cli_reason_missing_retry(capsys):
+                def test_retry_manual_reason_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry-manual-reason', 'My reason'],
@@ -207,15 +208,16 @@ def describe_bkyaml():
                     )
 
                 # pylint: disable=invalid-name
-                def test_retry_manual_cli_permit_on_passed_missing_retry(capsys):
+                def test_retry_manual_pop_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry-manual-permit-on-passed'],
-                        '--[no-]retry-manual-permit-on-passed requires --retry manual'
+                        '--[no-]retry-manual-permit-on-passed'
+                        + ' requires --retry manual'
                     )
 
                 # pylint: disable=invalid-name
-                def test_retry_manual_cli_permit_on_passed_manual_retry(capsys, snapshot):
+                def test_retry_manual_pop_manual_retry(capsys, snapshot):
                     run_run(
                         capsys,
                         snapshot,
@@ -266,35 +268,37 @@ def describe_bkyaml():
                     args.retry_automatic_tuple = [['*', 2], [1, 3]]
                     generic_command_call(args, snapshot)
 
-                def test_retry_automatic_cli_exit_status_string(capsys):
+                def test_exit_status_string(capsys):
                     assert_command_call_error(
                         capsys,
-                        ['--retry', 'automatic', '--retry-automatic-exit-status', 'xxx'],
+                        ['--retry', 'automatic',
+                         '--retry-automatic-exit-status', 'xxx'],
                         'xxx is an invalid value'
                     )
 
-                def test_retry_automatic_cli_exit_status_missing_retry(capsys):
+                def test_retry_exit_status_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry-automatic-exit-status', '*'],
-                        '--retry-automatic-exit-status requires --retry automatic'
+                        '--retry-automatic-exit-status'
+                        + ' requires --retry automatic'
                     )
 
-                def test_retry_automatic_cli_limit_missing_retry(capsys):
+                def test_retry_limit_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry-automatic-limit', '2'],
                         '--retry-automatic-limit requires --retry automatic'
                     )
 
-                def test_retry_automatic_cli_tuple_missing_retry(capsys):
+                def test_retry_tuple_missing_retry(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry-automatic-tuple', '*', '2'],
                         '--retry-automatic-tuple requires --retry automatic'
                     )
 
-                def test_retry_automatic_cli_tuple_missing_combine_exit_status(capsys):
+                def test_retry_tuple_missing_combine_exit_status(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry', 'automatic',
@@ -304,13 +308,15 @@ def describe_bkyaml():
                         + ' --retry-automatic-exit-status'
                     )
 
-                def test_retry_automatic_cli_tuple_missing_combine_limit(capsys):
+                def test_retry_tuple_missing_combine_limit(capsys):
                     assert_command_call_error(
                         capsys,
                         ['--retry', 'automatic',
                          '--retry-automatic-tuple', '*', '2',
                          '--retry-automatic-limit', '2'],
-                        '--retry-automatic-tuple can not be combined with --retry-automatic-limit'
+                        '--retry-automatic-tuple'
+                        + ' can not be combined with '
+                        + '--retry-automatic-limit'
                     )
 
     def describe_parse_main():

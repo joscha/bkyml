@@ -20,11 +20,13 @@ __license__ = "mit"
 
 LOGGER = logging.getLogger(__name__)
 
+
 class MyYAML(RuamelYaml):
     def to_string(self, data):
         stream = StringIO()
         RuamelYaml.dump(self, data, stream)
         return stream.getvalue()
+
 
 YAML = MyYAML()
 YAML.default_flow_style = False
@@ -32,11 +34,15 @@ YAML.default_flow_style = False
 RETRY_MANUAL_ALLOWED_DEFAULT = True
 RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT = False
 
+
 def check_positive(value):
     ivalue = int(value)
     if ivalue <= 0:
-        raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+        raise argparse.ArgumentTypeError(
+            "%s is an invalid positive int value" % value
+        )
     return ivalue
+
 
 def bool_or_string(value):
     if value.lower() == 'true':
@@ -44,6 +50,7 @@ def bool_or_string(value):
     if value.lower() == 'false':
         return False
     return value
+
 
 def int_or_star(value):
     if value == '*':
@@ -54,8 +61,10 @@ def int_or_star(value):
         except ValueError:
             raise argparse.ArgumentTypeError("%s is an invalid value" % value)
 
+
 def ns_hasattr(namespace, attr):
     return hasattr(namespace, attr) and getattr(namespace, attr) is not None
+
 
 def tuples_to_dict(tuples):
     ret = {}
@@ -63,12 +72,15 @@ def tuples_to_dict(tuples):
         ret[tpl[0]] = tpl[1]
     return ret
 
+
 def singlify(a_list):
     if len(a_list) == 1:
         return a_list[0]
     return a_list
 
+
 class Comment:
+
     @staticmethod
     def install(action):
         parser = action.add_parser('comment')
@@ -85,7 +97,9 @@ class Comment:
         lines = "\n# ".join(' '.join(namespace.str).splitlines())
         return f"# {lines}"
 
+
 class Steps:
+
     @staticmethod
     def install(action):
         parser = action.add_parser('steps')
@@ -96,7 +110,9 @@ class Steps:
     def steps(namespace):
         return "steps:"
 
+
 class Env:
+
     @staticmethod
     def install(action):
         parser = action.add_parser('env')
@@ -117,6 +133,7 @@ class Env:
             'env': tuples_to_dict(namespace.var),
         })
 
+
 class Command:
 
     # pylint: disable=line-too-long
@@ -133,12 +150,12 @@ class Command:
             required=True)
         parser.add_argument(
             '--label',
-            help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.",
+            help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.", # NOQA
             type=str,
             metavar="LABEL")
         parser.add_argument(
             '--branches',
-            help="The branch pattern defining which branches will include this step in their builds.",
+            help="The branch pattern defining which branches will include this step in their builds.", # NOQA
             type=str,
             nargs='+',
             metavar="BRANCH_PATTERN"
@@ -175,19 +192,19 @@ class Command:
         )
         parser.add_argument(
             '--concurrency',
-            help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.",
+            help="The maximum number of jobs created from this step that are allowed to run at the same time. Requires --concurrency-group.", # NOQA
             type=check_positive,
             metavar="POSITIVE_INT"
         )
         parser.add_argument(
             '--concurrency-group',
-            help="A unique name for the concurrency group that you are creating with the concurrency attribute.",
+            help="A unique name for the concurrency group that you are creating with the concurrency attribute.", # NOQA
             type=str,
             metavar="GROUP_NAME"
         )
         parser.add_argument(
             '--timeout-in-minutes',
-            help="The number of minutes a job created from this step is allowed to run. If the job does not finish within this limit, it will be automatically cancelled and the build will fail.",
+            help="The number of minutes a job created from this step is allowed to run. If the job does not finish within this limit, it will be automatically cancelled and the build will fail.", # NOQA
             type=int,
             metavar="TIMEOUT"
         )
@@ -210,13 +227,13 @@ class Command:
         )
         parser.add_argument(
             '--retry-automatic-limit',
-            help="The number of times this job can be retried. The maximum value this can be set to is 10.",
+            help="The number of times this job can be retried. The maximum value this can be set to is 10.", # NOQA
             type=check_positive,
             metavar="POSITIVE_INT"
         )
         parser.add_argument(
             '--retry-automatic-tuple',
-            help="The exit status number that will cause this job to retry and a limit to go with it.",
+            help="The exit status number that will cause this job to retry and a limit to go with it.", # NOQA
             type=int_or_star,
             nargs=2,
             action='append',
@@ -262,7 +279,8 @@ class Command:
         if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
             parser.error("--concurrency requires --concurrency-group.")
 
-        if not ns_hasattr(parsed, 'retry') or (ns_hasattr(parsed, 'retry') and parsed.retry != 'automatic'):
+        if not ns_hasattr(parsed, 'retry') \
+           or (ns_hasattr(parsed, 'retry') and parsed.retry != 'automatic'):
             if ns_hasattr(parsed, 'retry_automatic_exit_status'):
                 parser.error('--retry-automatic-exit-status requires --retry automatic.')
 
@@ -272,17 +290,23 @@ class Command:
             if ns_hasattr(parsed, 'retry_automatic_tuple'):
                 parser.error('--retry-automatic-tuple requires --retry automatic.')
 
-        if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_exit_status'):
-            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.')
+        if ns_hasattr(parsed, 'retry_automatic_tuple') \
+           and ns_hasattr(parsed, 'retry_automatic_exit_status'):
+            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.') # NOQA
 
-        if ns_hasattr(parsed, 'retry_automatic_tuple') and ns_hasattr(parsed, 'retry_automatic_limit'):
-            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.')
+        if ns_hasattr(parsed, 'retry_automatic_tuple') \
+           and ns_hasattr(parsed, 'retry_automatic_limit'):
+            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.') # NOQA
 
-        if not ns_hasattr(parsed, 'retry') or (ns_hasattr(parsed, 'retry') and parsed.retry != 'manual'):
-            if ns_hasattr(parsed, 'retry_manual_allowed') and parsed.retry_manual_allowed is not RETRY_MANUAL_ALLOWED_DEFAULT:
+        if not ns_hasattr(parsed, 'retry') \
+           or (ns_hasattr(parsed, 'retry') and parsed.retry != 'manual'):
+            if ns_hasattr(parsed, 'retry_manual_allowed') \
+               and parsed.retry_manual_allowed is not RETRY_MANUAL_ALLOWED_DEFAULT:
                 parser.error('--[no-]retry-manual-allowed requires --retry manual.')
 
-            if ns_hasattr(parsed, 'retry_manual_permit_on_passed') and parsed.retry_manual_permit_on_passed is not RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT:
+            if ns_hasattr(parsed, 'retry_manual_permit_on_passed') \
+               and parsed.retry_manual_permit_on_passed \
+               is not RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT:
                 parser.error('--[no-]retry-manual-permit-on-passed requires --retry manual.')
 
             if ns_hasattr(parsed, 'retry_manual_reason'):
@@ -337,7 +361,8 @@ class Command:
             step['timeout_in_minutes'] = namespace.timeout_in_minutes
 
         # skip
-        if ns_hasattr(namespace, 'skip') and (namespace.skip is True or isinstance(namespace.skip, str)):
+        if ns_hasattr(namespace, 'skip') \
+           and (namespace.skip is True or isinstance(namespace.skip, str)):
             step['skip'] = namespace.skip
 
         # retry
@@ -359,12 +384,14 @@ class Command:
                                 'limit': min(10, check_positive(tpl[1])),
                             })
             elif namespace.retry == 'manual':
-                if ns_hasattr(namespace, 'retry_manual_allowed') and not namespace.retry_manual_allowed:
+                if ns_hasattr(namespace, 'retry_manual_allowed') \
+                   and not namespace.retry_manual_allowed:
                     retry[namespace.retry]['allowed'] = namespace.retry_manual_allowed
                 if ns_hasattr(namespace, 'retry_manual_reason'):
                     retry[namespace.retry]['reason'] = namespace.retry_manual_reason
-                if ns_hasattr(namespace, 'retry_manual_permit_on_passed') and namespace.retry_manual_permit_on_passed:
-                    retry[namespace.retry]['permit_on_passed'] = namespace.retry_manual_permit_on_passed
+                if ns_hasattr(namespace, 'retry_manual_permit_on_passed') \
+                   and namespace.retry_manual_permit_on_passed:
+                    retry[namespace.retry]['permit_on_passed'] = namespace.retry_manual_permit_on_passed # NOQA
             else:
                 raise argparse.ArgumentTypeError("%s is an invalid retry value" % namespace.retry)
 
@@ -374,6 +401,7 @@ class Command:
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
+
 
 def parse_args(args):
     """Parse command line parameters
@@ -419,6 +447,7 @@ def parse_args(args):
     Command.assert_post_parse(parsed, parser)
     return parsed
 
+
 def setup_logging(loglevel):
     """Setup basic logging
 
@@ -429,12 +458,14 @@ def setup_logging(loglevel):
     logging.basicConfig(level=loglevel, stream=sys.stdout,
                         format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
+
 def parse_main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
     if hasattr(args, 'func'):
         return args.func(args)
     return None
+
 
 def main(args):
     """Main entry point allowing external calls
@@ -447,6 +478,7 @@ def main(args):
     if ret is not None:
         print(ret)
     LOGGER.info("Script ends here")
+
 
 def run():
     """Entry point for console_scripts
