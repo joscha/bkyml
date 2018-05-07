@@ -40,6 +40,7 @@ def plugin_or_key_value_pair(value):
         return value.split('=', 1)
     return value
 
+
 def check_positive(value):
     ivalue = int(value)
     if ivalue <= 0:
@@ -305,11 +306,11 @@ class Command:
                 parser.error('--retry-automatic-tuple requires --retry automatic.')
 
         if ns_hasattr(parsed, 'retry_automatic_tuple') and \
-            ns_hasattr(parsed, 'retry_automatic_exit_status'):
+           ns_hasattr(parsed, 'retry_automatic_exit_status'):
                 parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.') # NOQA
 
         if ns_hasattr(parsed, 'retry_automatic_tuple') and \
-            ns_hasattr(parsed, 'retry_automatic_limit'):
+           ns_hasattr(parsed, 'retry_automatic_limit'):
                 parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.') # NOQA
 
         if not ns_hasattr(parsed, 'retry') or parsed.retry != 'manual':
