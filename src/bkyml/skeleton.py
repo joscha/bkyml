@@ -279,8 +279,7 @@ class Command:
         if ns_hasattr(parsed, 'concurrency') and not ns_hasattr(parsed, 'concurrency_group'):
             parser.error("--concurrency requires --concurrency-group.")
 
-        if not ns_hasattr(parsed, 'retry') \
-           or (ns_hasattr(parsed, 'retry') and parsed.retry != 'automatic'):
+        if not ns_hasattr(parsed, 'retry') or parsed.retry != 'automatic':
             if ns_hasattr(parsed, 'retry_automatic_exit_status'):
                 parser.error('--retry-automatic-exit-status requires --retry automatic.')
 
@@ -290,16 +289,15 @@ class Command:
             if ns_hasattr(parsed, 'retry_automatic_tuple'):
                 parser.error('--retry-automatic-tuple requires --retry automatic.')
 
-        if ns_hasattr(parsed, 'retry_automatic_tuple') \
-           and ns_hasattr(parsed, 'retry_automatic_exit_status'):
-            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.') # NOQA
+        if ns_hasattr(parsed, 'retry_automatic_tuple'):
+            if ns_hasattr(parsed, 'retry_automatic_exit_status'):
+                parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-exit-status.') # NOQA
 
-        if ns_hasattr(parsed, 'retry_automatic_tuple') \
-           and ns_hasattr(parsed, 'retry_automatic_limit'):
-            parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.') # NOQA
+        if ns_hasattr(parsed, 'retry_automatic_tuple'):
+            if ns_hasattr(parsed, 'retry_automatic_limit'):
+                parser.error('--retry-automatic-tuple can not be combined with --retry-automatic-limit.') # NOQA
 
-        if not ns_hasattr(parsed, 'retry') \
-           or (ns_hasattr(parsed, 'retry') and parsed.retry != 'manual'):
+        if not ns_hasattr(parsed, 'retry') or parsed.retry != 'manual':
             if ns_hasattr(parsed, 'retry_manual_allowed') \
                and parsed.retry_manual_allowed is not RETRY_MANUAL_ALLOWED_DEFAULT:
                 parser.error('--[no-]retry-manual-allowed requires --retry manual.')
