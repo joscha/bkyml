@@ -58,7 +58,7 @@ Missing features:
 
 * block step
 * trigger step
-* plugin step (and command step with plugin extension)
+* plugin step
 
 Sub-Commands
 ============
@@ -137,7 +137,8 @@ Example:
       --skip 'Some reason' \
       --retry automatic \
       --retry-automatic-tuple '*' 2 \
-      --retry-automatic-tuple 1 3
+      --retry-automatic-tuple 1 3 \
+      --plugin docker-compose#v1.3.2 build=app image-repository=index.docker.io/org/repo
 
 will produce
 
@@ -166,6 +167,10 @@ will produce
           limit: 2
         - exit_status: 1
           limit: 3
+    plugins:
+      docker-compose#v1.3.2:
+        build: app
+        image-repository: index.docker.io/org/repo
 
 There is also:
 

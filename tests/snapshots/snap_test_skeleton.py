@@ -46,6 +46,7 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--retry-manual-reason REASON]
                 [--retry-manual-permit-on-passed]
                 [--no-retry-manual-permit-on-passed]
+                [--plugin PLUGIN [KEY_VALUE_PAIR ...]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,6 +102,9 @@ optional arguments:
                         This job can be retried after it has passed.
   --no-retry-manual-permit-on-passed
                         This job can not be retried after it has passed.
+  --plugin PLUGIN [KEY_VALUE_PAIR ...]
+                        A plugin to run with this step. Optionally key/value
+                        pairs for the plugin.
 '''
 
 snapshots['test_empty_command 1'] = ''
@@ -283,4 +287,29 @@ snapshots['test_retry_manual_pop_manual_retry 1'] = '''  - command: cmd
       manual:
         permit_on_passed: true
 
+'''
+
+snapshots['test_plugin_none 1'] = '''  - command: cmd
+'''
+
+snapshots['test_plugin_1 1'] = '''  - command: cmd
+    plugins:
+      org/repo#1.0.0:
+        a: b
+        c: d
+'''
+
+snapshots['test_plugin_n 1'] = '''  - command: cmd
+    plugins:
+      org/repo#1.0.0:
+        a: b
+        c: d
+      other_org/other_repo:
+        e: f
+        g: h=i
+'''
+
+snapshots['test_plugin_no_args 1'] = '''  - command: cmd
+    plugins:
+      org/repo#1.0.0:
 '''

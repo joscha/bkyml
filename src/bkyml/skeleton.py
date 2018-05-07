@@ -35,6 +35,11 @@ RETRY_MANUAL_ALLOWED_DEFAULT = True
 RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT = False
 
 
+def plugin_or_key_value_pair(value):
+    if '=' in value:
+        return value.split('=', 1)
+    return value
+
 def check_positive(value):
     ivalue = int(value)
     if ivalue <= 0:
@@ -272,6 +277,16 @@ class Command:
         )
         parser.set_defaults(retry_manual_permit_on_passed=RETRY_MANUAL_PERMIT_ON_PASSED_DEFAULT)
 
+        parser.add_argument(
+            '--plugin',
+            help="A plugin to run with this step. Optionally key/value pairs for the plugin.",
+            dest="plugin",
+            nargs='+',
+            action='append',
+            type=plugin_or_key_value_pair,
+            metavar=('PLUGIN', 'KEY_VALUE_PAIR')
+        )
+
         parser.set_defaults(func=Command.command)
 
     @staticmethod
@@ -396,6 +411,17 @@ class Command:
             if not retry[namespace.retry]:
                 retry[namespace.retry] = True
             step['retry'] = retry
+
+        if ns_hasattr(namespace, 'plugin') and namespace.plugin:
+            plugins = {}
+
+            for plugin in namespace.plugin:
+                name, tuples = plugin[0], plugin[1:]
+                plugins[name] = None
+                if tuples:
+                    plugins[name] = tuples_to_dict(tuples)
+
+            step['plugins'] = plugins
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])

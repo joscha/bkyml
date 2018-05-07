@@ -319,6 +319,29 @@ def describe_bkyaml():
                         + '--retry-automatic-limit'
                     )
 
+        def describe_plugin():
+
+            def test_plugin_none(args, snapshot):
+                args.plugin = []
+                generic_command_call(args, snapshot)
+
+            def test_plugin_no_args(args, snapshot):
+                args.plugin = [['org/repo#1.0.0']]
+                generic_command_call(args, snapshot)
+
+            def test_plugin_1(args, snapshot):
+                args.plugin = [
+                    ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']]
+                ]
+                generic_command_call(args, snapshot)
+
+            def test_plugin_n(args, snapshot):
+                args.plugin = [
+                    ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']],
+                    ['other_org/other_repo', ['e', 'f'], ['g', 'h=i']],
+                ]
+                generic_command_call(args, snapshot)
+
     def describe_parse_main():
         def test_main(snapshot):
             snapshot.assert_match(parse_main(['command', '--command', 'x']))
