@@ -14,7 +14,8 @@ from bkyml.skeleton import Comment, \
                            parse_main, \
                            run, \
                            check_positive, \
-                           bool_or_string
+                           bool_or_string, \
+                           plugin_or_key_value_pair
 
 __author__ = "Joscha Feth"
 __copyright__ = "Joscha Feth"
@@ -33,6 +34,13 @@ def describe_bkyaml():
     @pytest.fixture
     def args():
         return argparse.Namespace()
+
+    def describe_plugin_or_key_value_pair():
+        def test_plugin_or_key_value_pair_plugin():
+            assert plugin_or_key_value_pair('org/repo#1.0.0') == 'org/repo#1.0.0'
+
+        def test_plugin_or_key_value_pair_pair():
+            assert plugin_or_key_value_pair('a=b=c') == ['a', 'b=c']
 
     def describe_check_positive():
         def test_check_positive_1():
