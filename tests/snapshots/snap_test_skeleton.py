@@ -7,7 +7,8 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_comment 1'] = '# a b'
+snapshots['test_comment 1'] = '''# a
+# b'''
 
 snapshots['test_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
 

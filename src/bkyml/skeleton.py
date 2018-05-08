@@ -153,7 +153,7 @@ class Comment:
 
     @staticmethod
     def comment(namespace):
-        lines = "\n# ".join(' '.join(namespace.str).splitlines())
+        lines = "\n# ".join(namespace.str)
         return f"# {lines}"
 
 

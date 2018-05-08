@@ -88,13 +88,14 @@ Example:
 .. code:: shell
 
   bkyml comment \
-      bla foo
+      'Hello world!' 'What a nice day :)'
 
 will produce
 
 .. code:: yaml
 
-  # bla foo
+  # Hello world!
+  # What a nice day :)
 
 
 env
