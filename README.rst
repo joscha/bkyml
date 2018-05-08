@@ -60,7 +60,6 @@ Missing features:
 
 * block step
 * trigger step
-* plugin step
 
 Sub-Commands
 ============
@@ -210,3 +209,27 @@ will result in
         allowed: false
         reason: Just because
         permit_on_passed: true
+
+plugin
+------
+
+Example:
+
+.. code:: shell
+
+  bkyaml plugin \
+      --plugin 'org/repo#1.0.0' some=var other=var \
+      --plugin 'org/other_repo' more=var \
+      --name 'My name is working'
+
+will result in
+
+.. code:: yaml
+
+  - name: My name is working
+    plugins:
+      org/repo#1.0.0:
+        some: var
+        other: var
+      org/other_repo:
+        more: var

@@ -289,17 +289,32 @@ snapshots['test_retry_manual_pop_manual_retry 1'] = '''  - command: cmd
 
 '''
 
-snapshots['test_plugin_none 1'] = '''  - command: cmd
+snapshots['test_help 5'] = '''usage:  plugin [-h] [--name NAME] --plugin PLUGIN [KEY_VALUE_PAIR ...]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --name NAME           Name of the plugin step
+  --plugin PLUGIN [KEY_VALUE_PAIR ...]
+                        A plugin to run. Optionally key/value pairs for the
+                        plugin.
 '''
 
-snapshots['test_plugin_1 1'] = '''  - command: cmd
+snapshots['test_command_plugin_none 1'] = '''  - command: cmd
+'''
+
+snapshots['test_command_plugin_no_args 1'] = '''  - command: cmd
+    plugins:
+      org/repo#1.0.0:
+'''
+
+snapshots['test_command_plugin_1 1'] = '''  - command: cmd
     plugins:
       org/repo#1.0.0:
         a: b
         c: d
 '''
 
-snapshots['test_plugin_n 1'] = '''  - command: cmd
+snapshots['test_command_plugin_n 1'] = '''  - command: cmd
     plugins:
       org/repo#1.0.0:
         a: b
@@ -309,7 +324,28 @@ snapshots['test_plugin_n 1'] = '''  - command: cmd
         g: h=i
 '''
 
-snapshots['test_plugin_no_args 1'] = '''  - command: cmd
+snapshots['test_plugin_plugin_none 1'] = ''
+
+snapshots['test_plugin_plugin_no_args 1'] = '''  - plugins:
+      org/repo#1.0.0:
+'''
+
+snapshots['test_plugin_plugin_1 1'] = '''  - plugins:
+      org/repo#1.0.0:
+        a: b
+        c: d
+'''
+
+snapshots['test_plugin_plugin_n 1'] = '''  - plugins:
+      org/repo#1.0.0:
+        a: b
+        c: d
+      other_org/other_repo:
+        e: f
+        g: h=i
+'''
+
+snapshots['test_plugin_name_attr 1'] = '''  - name: My plugin run
     plugins:
       org/repo#1.0.0:
 '''

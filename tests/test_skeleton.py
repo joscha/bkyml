@@ -11,6 +11,7 @@ from bkyml.skeleton import Comment, \
                            Steps, \
                            Env, \
                            Command, \
+                           Plugin, \
                            parse_main, \
                            run, \
                            check_positive, \
@@ -327,28 +328,65 @@ def describe_bkyaml():
                         + '--retry-automatic-limit'
                     )
 
-        def describe_plugin():
+        def describe_command_plugin_attr():
 
-            def test_plugin_none(args, snapshot):
+            def test_command_plugin_none(args, snapshot):
                 args.plugin = []
                 generic_command_call(args, snapshot)
 
-            def test_plugin_no_args(args, snapshot):
+            def test_command_plugin_no_args(args, snapshot):
                 args.plugin = [['org/repo#1.0.0']]
                 generic_command_call(args, snapshot)
 
-            def test_plugin_1(args, snapshot):
+            def test_command_plugin_1(args, snapshot):
                 args.plugin = [
                     ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']]
                 ]
                 generic_command_call(args, snapshot)
 
-            def test_plugin_n(args, snapshot):
+            def test_command_plugin_n(args, snapshot):
                 args.plugin = [
                     ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']],
                     ['other_org/other_repo', ['e', 'f'], ['g', 'h=i']],
                 ]
                 generic_command_call(args, snapshot)
+
+    def describe_plugin():
+
+        @pytest.fixture
+        def generic_plugin_call(args, snapshot):
+            args.command = [['plugin']]
+            snapshot.assert_match(Plugin.plugin(args))
+
+        def describe_plugin_name_attr():
+
+            def test_plugin_name_attr(args, snapshot):
+                args.plugin = [['org/repo#1.0.0']]
+                args.name = 'My plugin run'
+                generic_plugin_call(args, snapshot)
+
+        def describe_plugin_plugin_attr():
+
+            def test_plugin_plugin_none(args, snapshot):
+                args.plugin = []
+                generic_plugin_call(args, snapshot)
+
+            def test_plugin_plugin_no_args(args, snapshot):
+                args.plugin = [['org/repo#1.0.0']]
+                generic_plugin_call(args, snapshot)
+
+            def test_plugin_plugin_1(args, snapshot):
+                args.plugin = [
+                    ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']]
+                ]
+                generic_plugin_call(args, snapshot)
+
+            def test_plugin_plugin_n(args, snapshot):
+                args.plugin = [
+                    ['org/repo#1.0.0', ['a', 'b'], ['c', 'd']],
+                    ['other_org/other_repo', ['e', 'f'], ['g', 'h=i']],
+                ]
+                generic_plugin_call(args, snapshot)
 
     def describe_parse_main():
         def test_main(snapshot):
@@ -362,7 +400,7 @@ def describe_bkyaml():
             run_run(capsys, snapshot, [])
 
         def test_help(snapshot, capsys):
-            for subcommand in ['comment', 'steps', 'env', 'command']:
+            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin']:
                 with pytest.raises(SystemExit):
                     with patch.object(sys, 'argv', ['', subcommand, '--help']):
                         run()

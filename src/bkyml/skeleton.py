@@ -85,6 +85,59 @@ def singlify(a_list):
     return a_list
 
 
+def plugins_section(step, namespace):
+    if ns_hasattr(namespace, 'plugin') and namespace.plugin:
+        plugins = {}
+
+        for plugin in namespace.plugin:
+            name, tuples = plugin[0], plugin[1:]
+            plugins[name] = None
+            if tuples:
+                plugins[name] = tuples_to_dict(tuples)
+        return plugins
+    return None
+
+
+class Plugin:
+
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('plugin')
+        parser.add_argument(
+            '--name',
+            dest="name",
+            help="Name of the plugin step",
+            type=str,
+            metavar="NAME")
+        parser.add_argument(
+            '--plugin',
+            help="A plugin to run. Optionally key/value pairs for the plugin.",
+            dest="plugin",
+            nargs='+',
+            action='append',
+            type=plugin_or_key_value_pair,
+            metavar=('PLUGIN', 'KEY_VALUE_PAIR'),
+            required=True
+        )
+        parser.set_defaults(func=Plugin.plugin)
+
+    @staticmethod
+    def plugin(namespace):
+        step = {}
+
+        if ns_hasattr(namespace, 'name') and namespace.name:
+            step['name'] = namespace.name
+
+        plugins = plugins_section(step, namespace)
+        if plugins:
+            step['plugins'] = plugins
+        else:
+            return ''
+
+        YAML.indent(sequence=4, offset=2)
+        return YAML.to_string([step])
+
+
 class Comment:
 
     @staticmethod
@@ -413,15 +466,9 @@ class Command:
                 retry[namespace.retry] = True
             step['retry'] = retry
 
-        if ns_hasattr(namespace, 'plugin') and namespace.plugin:
-            plugins = {}
-
-            for plugin in namespace.plugin:
-                name, tuples = plugin[0], plugin[1:]
-                plugins[name] = None
-                if tuples:
-                    plugins[name] = tuples_to_dict(tuples)
-
+        # plugins
+        plugins = plugins_section(step, namespace)
+        if plugins:
             step['plugins'] = plugins
 
         YAML.indent(sequence=4, offset=2)
@@ -448,6 +495,7 @@ def parse_args(args):
     Steps.install(subparsers)
     Env.install(subparsers)
     Command.install(subparsers)
+    Plugin.install(subparsers)
 
     parser.add_argument(
         '--version',
