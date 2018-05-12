@@ -68,10 +68,6 @@ This allows you to dynamically generate pipelines:
   done
 
 
-Missing features:
-
-* block step
-
 Sub-Commands
 ============
 
