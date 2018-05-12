@@ -108,6 +108,40 @@ def describe_bkyaml():
         def test_block_simple(args, snapshot):
             generic_block_call(args, snapshot)
 
+        def test_block_prompt(args, snapshot):
+            args.prompt = 'Really release?'
+            generic_block_call(args, snapshot)
+
+        def test_block_branches(args, snapshot):
+            args.branches = ['master', 'release-*']
+            generic_block_call(args, snapshot)
+
+        def test_block_field_text(args, snapshot):
+            args.field_text = [['key', 'label', 'hint', 'false', 'default']]
+            generic_block_call(args, snapshot)
+
+        def test_block_field_text_no_key(args, snapshot):
+            args.field_text = [['', 'label', 'hint', 'false', 'default']]
+            with pytest.raises(argparse.ArgumentTypeError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_text_no_label(args, snapshot):
+            args.field_text = [['key', '', 'hint', 'false', 'default']]
+            with pytest.raises(argparse.ArgumentTypeError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_text_no_hint(args, snapshot):
+            args.field_text = [['key', 'label', '', 'false', 'default']]
+            generic_block_call(args, snapshot)
+
+        def test_block_field_text_no_default(args, snapshot):
+            args.field_text = [['key', 'label', 'hint', 'false', '']]
+            generic_block_call(args, snapshot)
+
+        def test_block_field_text_required(args, snapshot):
+            args.field_text = [['key', 'label', 'hint', 'true', 'default']]
+            generic_block_call(args, snapshot)
+
     def describe_trigger():
         @pytest.fixture
         def generic_trigger_call(args, snapshot):

@@ -108,6 +108,32 @@ class Block:
             help="Label of the block step. Supports emoji.",
             type=str,
             metavar="LABEL")
+        parser.add_argument(
+            '--prompt',
+            help="The instructional message displayed in the dialog box when the unblock step is activated.", # NOQA
+            type=str,
+            metavar="PROMPT")
+        parser.add_argument(
+            '--branches',
+            help="The branch pattern defining which branches will include this step in their builds.", # NOQA
+            type=str,
+            nargs='+',
+            metavar="BRANCH_PATTERN"
+        )
+        parser.add_argument(
+            '--field-text',
+            help="A text field. \
+                KEY is the meta-data key that stores the field's input. \
+                LABEL is the label of the field. \
+                HINT is the explanatory text that is shown after the label.\
+                REQUIRED (true/false) A boolean value that defines whether the field is required for form submission. \
+                DEFAULT is value that is pre-filled in the text field. \
+                ", # NOQA
+            type=str,
+            nargs=5,
+            action='append',
+            metavar=('KEY', 'LABEL', 'HINT', 'REQUIRED', 'DEFAULT')
+        )
         parser.set_defaults(func=Block.block)
 
     @staticmethod
@@ -116,6 +142,40 @@ class Block:
         step = {
             'block': namespace.label
         }
+
+        # prompt
+        if ns_hasattr(namespace, 'prompt'):
+            step['prompt'] = namespace.prompt
+
+        # branches
+        if ns_hasattr(namespace, 'branches'):
+            step['branches'] = ' '.join(namespace.branches)
+
+        # Fields
+        has_text_fields = ns_hasattr(namespace, 'field_text')
+        has_select_fields = ns_hasattr(namespace, 'field_select')
+
+        if has_select_fields or has_text_fields:
+            fields = step['fields'] = []
+            if has_text_fields:
+                for text_field in namespace.field_text:
+                    [key, label, hint, required, default] = text_field
+                    if key is None or key.strip() == '':
+                        raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
+                    if label is None or label.strip() == '':
+                        raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
+                    field = {
+                        'text': label,
+                        'key': key
+                    }
+                    if hint:
+                        field['hint'] = hint
+                    if required.lower() == 'true':
+                        field['required'] = True
+                    if default:
+                        field['default'] = default
+                    fields.append(field)
+
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
 

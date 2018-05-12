@@ -456,13 +456,28 @@ subcommands:
                         additional help
 '''
 
-snapshots['test_help 8'] = '''usage:  block [-h] LABEL
+snapshots['test_help 8'] = '''usage:  block [-h] [--prompt PROMPT]
+              [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
+              [--field-text KEY LABEL HINT REQUIRED DEFAULT]
+              LABEL
 
 positional arguments:
-  LABEL       Label of the block step. Supports emoji.
+  LABEL                 Label of the block step. Supports emoji.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help            show this help message and exit
+  --prompt PROMPT       The instructional message displayed in the dialog box
+                        when the unblock step is activated.
+  --branches BRANCH_PATTERN [BRANCH_PATTERN ...]
+                        The branch pattern defining which branches will
+                        include this step in their builds.
+  --field-text KEY LABEL HINT REQUIRED DEFAULT
+                        A text field. KEY is the meta-data key that stores the
+                        field's input. LABEL is the label of the field. HINT
+                        is the explanatory text that is shown after the label.
+                        REQUIRED (true/false) A boolean value that defines
+                        whether the field is required for form submission.
+                        DEFAULT is value that is pre-filled in the text field.
 '''
 
 snapshots['test_block_simple 1'] = '''  - block: ':rocket: Release'
@@ -470,4 +485,43 @@ snapshots['test_block_simple 1'] = '''  - block: ':rocket: Release'
 
 snapshots['test_cli_command 1'] = '''  - command: x
 
+'''
+
+snapshots['test_block_prompt 1'] = '''  - block: ':rocket: Release'
+    prompt: Really release?
+'''
+
+snapshots['test_block_branches 1'] = '''  - block: ':rocket: Release'
+    branches: master release-*
+'''
+
+snapshots['test_block_field_text 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - text: label
+        key: key
+        hint: hint
+        default: default
+'''
+
+snapshots['test_block_field_text_required 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - text: label
+        key: key
+        hint: hint
+        required: true
+        default: default
+'''
+
+snapshots['test_block_field_text_no_hint 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - text: label
+        key: key
+        default: default
+'''
+
+snapshots['test_block_field_text_no_default 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - text: label
+        key: key
+        hint: hint
 '''
