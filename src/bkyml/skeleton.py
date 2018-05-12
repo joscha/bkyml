@@ -651,6 +651,10 @@ def parse_args(args):
         action='store_const',
         const=logging.DEBUG)
 
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     parsed = parser.parse_args(args)
     Command.assert_post_parse(parsed, parser)
     return parsed

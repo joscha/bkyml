@@ -105,8 +105,6 @@ optional arguments:
                         pairs for the plugin.
 '''
 
-snapshots['test_empty_command 1'] = ''
-
 snapshots['test_steps 1'] = '''steps:
 '''
 
@@ -442,4 +440,22 @@ snapshots['test_trigger_build_meta_data 1'] = '''  - trigger: my-pipeline
     build:
       meta_data:
         a: b
+'''
+
+snapshots['test_empty_command 1'] = '''usage:  [-h] [--version] [-v] [-vv]
+        {comment,steps,env,command,plugin,wait,trigger,block} ...
+
+Generate pipeline YAML for Buildkite
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -v, --verbose         set loglevel to INFO
+  -vv, --very-verbose   set loglevel to DEBUG
+
+subcommands:
+  valid subcommands
+
+  {comment,steps,env,command,plugin,wait,trigger,block}
+                        additional help
 '''
