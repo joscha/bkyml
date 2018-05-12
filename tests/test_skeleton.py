@@ -143,16 +143,40 @@ def describe_bkyaml():
             generic_block_call(args, snapshot)
 
         def test_block_field_select(args, snapshot):
-            args.field_select = [['key', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            args.field_select = [[
+                'key',
+                'label',
+                'hint',
+                'false',
+                'default',
+                'opt1=Label1',
+                'opt2=Label2'
+            ]]
             generic_block_call(args, snapshot)
 
         def test_block_field_select_no_key(args, snapshot):
-            args.field_select = [['', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            args.field_select = [[
+                '',
+                'label',
+                'hint',
+                'false',
+                'default',
+                'opt1=Label1',
+                'opt2=Label2'
+            ]]
             with pytest.raises(argparse.ArgumentTypeError):
                 generic_block_call(args, snapshot)
 
         def test_block_field_select_no_label(args, snapshot):
-            args.field_select = [['key', '', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            args.field_select = [[
+                'key',
+                '',
+                'hint',
+                'false',
+                'default',
+                'opt1=Label1',
+                'opt2=Label2'
+            ]]
             with pytest.raises(argparse.ArgumentTypeError):
                 generic_block_call(args, snapshot)
 
@@ -168,7 +192,15 @@ def describe_bkyaml():
 
         def test_block_field_multi_fields(args, snapshot):
             args.field_text = [['key', 'label', 'hint', 'false', 'default']]
-            args.field_select = [['key', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            args.field_select = [[
+                'key',
+                'label',
+                'hint',
+                'false',
+                'default',
+                'opt1=Label1',
+                'opt2=Label2'
+            ]]
             generic_block_call(args, snapshot)
 
     def describe_trigger():

@@ -145,7 +145,7 @@ class Block:
                 KEY_VALUE_PAIRS is value that is pre-selected. \
                 ", # NOQA
             type=str,
-            nargs='+', # TODO: This will produce an incorrect help entry
+            nargs='+',  # TODO: This will produce an incorrect help entry
             action='append',
             metavar='KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...]'
         )
@@ -180,8 +180,12 @@ class Block:
             if has_select_fields:
                 for select_field in namespace.field_select:
                     if len(select_field) < 6:
-                         raise argparse.ArgumentTypeError("Missing required parameters")
-                    key, label, hint, required, default = select_field[0], select_field[1], select_field[2], select_field[3], select_field[4]
+                        raise argparse.ArgumentTypeError("Missing required parameters")
+                    key, label, hint, required, default = select_field[0], \
+                        select_field[1], \
+                        select_field[2], \
+                        select_field[3], \
+                        select_field[4]
                     pairs = select_field[5:]
                     field = Block.gen_field('select', key, label, hint, required, default)
 
@@ -214,6 +218,7 @@ class Block:
         if default:
             field['default'] = default
         return field
+
 
 class Trigger:
 
