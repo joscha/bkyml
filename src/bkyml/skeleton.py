@@ -167,7 +167,7 @@ class Steps:
     @staticmethod
     # pylint: disable=unused-argument
     def steps(namespace):
-        return "steps:"
+        return YAML.to_string({ 'steps': None })
 
 
 class Env:
@@ -475,6 +475,31 @@ class Command:
         return YAML.to_string([step])
 
 
+class Wait:
+
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('wait')
+        parser.add_argument(
+            '--continue-on-failure',
+            action='store_true',
+            help="Continue even if previous steps failed",
+        )
+        parser.set_defaults(func=Wait.wait)
+
+    @staticmethod
+    def wait(namespace):
+        step = 'wait'
+
+        if ns_hasattr(namespace, 'continue_on_failure') and namespace.continue_on_failure:
+            step = {
+                'wait': None,
+                'continue_on_failure': True,
+            }
+
+        YAML.indent(sequence=4, offset=2)
+        return YAML.to_string([step])
+
 def parse_args(args):
     """Parse command line parameters
 
@@ -496,6 +521,7 @@ def parse_args(args):
     Env.install(subparsers)
     Command.install(subparsers)
     Plugin.install(subparsers)
+    Wait.install(subparsers)
 
     parser.add_argument(
         '--version',

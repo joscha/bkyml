@@ -17,12 +17,14 @@ Example:
 .. code:: shell
 
   bkyml comment 'Frontend tests pipeline'
-  bkyml env FORCE_COLOR=1
+  bkyml env --var FORCE_COLOR 1
   bkyml steps
   bkyml command \
       --command 'yarn install' \
       --command 'yarn test' \
       --label ':karma: tests'
+  bkyml wait
+  bkyml plugin --plugin 'org/upload-coverage#1.0.0' dir=./coverage
 
 will produce
 
@@ -30,12 +32,20 @@ will produce
 
   # Frontend tests pipeline
   env:
-    FORCE_COLOR: 1
+    FORCE_COLOR: '1'
+
   steps:
+
     - label: ':karma: tests'
       command:
         - yarn install
         - yarn test
+
+    - wait
+
+    - plugins:
+        org/upload-coverage#1.0.0:
+          dir: ./coverage
 
 
 This allows you to dynamically generate pipelines:
@@ -234,3 +244,21 @@ will result in
         other: var
       org/other_repo:
         more: var
+
+wait
+----
+
+Example
+
+.. code:: shell
+
+  bkyaml wait \
+      --continue-on-failure
+
+
+will result in
+
+.. code:: yaml
+
+  - wait:
+    continue_on_failure: true

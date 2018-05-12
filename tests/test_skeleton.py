@@ -12,6 +12,7 @@ from bkyml.skeleton import Comment, \
                            Env, \
                            Command, \
                            Plugin, \
+                           Wait, \
                            parse_main, \
                            run, \
                            check_positive, \
@@ -70,6 +71,14 @@ def describe_bkyaml():
     def describe_steps():
         def test_steps(args, snapshot):
             snapshot.assert_match(Steps.steps(args))
+
+    def describe_wait():
+        def test_wait(args, snapshot):
+            snapshot.assert_match(Wait.wait(args))
+
+        def test_wait_continue_on_failure(args, snapshot):
+            args.continue_on_failure = True
+            snapshot.assert_match(Wait.wait(args))
 
     def describe_env():
         def test_env_all(args, snapshot):
@@ -355,7 +364,6 @@ def describe_bkyaml():
 
         @pytest.fixture
         def generic_plugin_call(args, snapshot):
-            args.command = [['plugin']]
             snapshot.assert_match(Plugin.plugin(args))
 
         def describe_plugin_name_attr():
@@ -400,7 +408,7 @@ def describe_bkyaml():
             run_run(capsys, snapshot, [])
 
         def test_help(snapshot, capsys):
-            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin']:
+            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait']:
                 with pytest.raises(SystemExit):
                     with patch.object(sys, 'argv', ['', subcommand, '--help']):
                         run()

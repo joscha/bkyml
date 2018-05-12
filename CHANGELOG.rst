@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 1.3.0
+=============
+
+- ``wait`` step
+
 Version 1.2.0
 =============
 

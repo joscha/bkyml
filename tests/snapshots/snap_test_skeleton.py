@@ -110,7 +110,8 @@ optional arguments:
 
 snapshots['test_empty_command 1'] = ''
 
-snapshots['test_steps 1'] = 'steps:'
+snapshots['test_steps 1'] = '''steps:
+'''
 
 snapshots['test_command 1'] = '''  - command: x
 
@@ -349,4 +350,19 @@ snapshots['test_plugin_plugin_n 1'] = '''  - plugins:
 snapshots['test_plugin_name_attr 1'] = '''  - name: My plugin run
     plugins:
       org/repo#1.0.0:
+'''
+
+snapshots['test_help 6'] = '''usage:  wait [-h] [--continue-on-failure]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --continue-on-failure
+                        Continue even if previous steps failed
+'''
+
+snapshots['test_wait 1'] = '''  - wait
+'''
+
+snapshots['test_wait_continue_on_failure 1'] = '''  - wait:
+    continue_on_failure: true
 '''
