@@ -17,14 +17,16 @@ Example:
 .. code:: shell
 
   bkyml comment 'Frontend tests pipeline'
-  bkyml env --var FORCE_COLOR 1
+  bkyml env \
+      --var FORCE_COLOR 1
   bkyml steps
   bkyml command \
       --command 'yarn install' \
       --command 'yarn test' \
       --label ':karma: tests'
   bkyml wait
-  bkyml plugin --plugin 'org/upload-coverage#1.0.0' dir=./coverage
+  bkyml plugin \
+      --plugin 'org/upload-coverage#1.0.0' dir=./coverage
 
 will produce
 
