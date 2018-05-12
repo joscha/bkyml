@@ -13,6 +13,7 @@ from bkyml.skeleton import Comment, \
                            Command, \
                            Plugin, \
                            Wait, \
+                           Trigger, \
                            parse_main, \
                            run, \
                            check_positive, \
@@ -64,8 +65,16 @@ def describe_bkyaml():
             assert bool_or_string('bla') == 'bla'
 
     def describe_comment():
+        def test_comment_missing_str(args, snapshot):
+            with pytest.raises(AssertionError):
+                Comment.comment(args)
+
         def test_comment(args, snapshot):
             args.str = ['a', 'b']
+            snapshot.assert_match(Comment.comment(args))
+
+        def test_comment_multiline(args, snapshot):
+            args.str = ['multiline\ncomments', 'are fun']
             snapshot.assert_match(Comment.comment(args))
 
     def describe_steps():
@@ -84,6 +93,51 @@ def describe_bkyaml():
         def test_env_all(args, snapshot):
             args.var = [['a', 'b'], ['c', 'd']]
             snapshot.assert_match(Env.env(args))
+
+    def describe_trigger():
+        @pytest.fixture
+        def generic_trigger_call(args, snapshot):
+            args.pipeline = 'my-pipeline'
+            snapshot.assert_match(Trigger.trigger(args))
+
+        def test_trigger_missing(args, snapshot):
+            with pytest.raises(AssertionError):
+                snapshot.assert_match(Trigger.trigger(args))
+
+        def test_trigger_simple(args, snapshot):
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_label(args, snapshot):
+            args.label = ':rocket: Deploy'
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_async(args, snapshot):
+            args.async = True
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_branches(args, snapshot):
+            args.branches = ['master', 'release-*']
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_build_branch(args, snapshot):
+            args.build_branch = 'master'
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_build_commit(args, snapshot):
+            args.build_commit = 'c0ffee'
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_build_message(args, snapshot):
+            args.build_message = 'Put the lime in the coconut'
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_build_env(args, snapshot):
+            args.build_env = [['a', 'b']]
+            generic_trigger_call(args, snapshot)
+
+        def test_trigger_build_meta_data(args, snapshot):
+            args.build_meta_data = [['a', 'b']]
+            generic_trigger_call(args, snapshot)
 
     def describe_command():
         @pytest.fixture
@@ -408,7 +462,7 @@ def describe_bkyaml():
             run_run(capsys, snapshot, [])
 
         def test_help(snapshot, capsys):
-            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait']:
+            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait', 'trigger']:
                 with pytest.raises(SystemExit):
                     with patch.object(sys, 'argv', ['', subcommand, '--help']):
                         run()

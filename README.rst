@@ -71,7 +71,6 @@ This allows you to dynamically generate pipelines:
 Missing features:
 
 * block step
-* trigger step
 
 Sub-Commands
 ============
@@ -250,7 +249,7 @@ will result in
 wait
 ----
 
-Example
+Example:
 
 .. code:: shell
 
@@ -264,3 +263,33 @@ will result in
 
   - wait:
     continue_on_failure: true
+
+trigger
+-------
+
+Example:
+
+.. code:: shell
+
+  bkyaml trigger 'my-pipeline' \
+      --branches master '*-release' \
+      --build-message 'My build message' \
+      --build-commit c0ffee \
+      --build-branch green \
+      --build-env FORCE_COLOR 1 \
+      --build-meta-data release-name 1.0.0
+
+will result in
+
+.. code:: yaml
+
+  - trigger: my-pipeline
+    branches: master *-release
+    build:
+      branch: green
+      commit: c0ffee
+      message: My build message
+      env:
+        FORCE_COLOR: '1'
+      meta_data:
+        release-name: 1.0.0

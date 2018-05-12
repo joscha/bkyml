@@ -98,6 +98,113 @@ def plugins_section(step, namespace):
     return None
 
 
+class Trigger:
+
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('trigger')
+        parser.add_argument(
+            dest="pipeline",
+            help="Name of the pipeline to trigger",
+            type=str,
+            metavar="PIPELINE")
+        parser.add_argument(
+            '--label',
+            dest="label",
+            help="The label that will be displayed in the pipeline visualisation in Buildkite. Supports emoji.", # NOQA
+            type=str,
+            metavar="LABEL")
+        parser.add_argument(
+            '--async',
+            action='store_true',
+            help="If given, the step will immediately continue, regardless of the success of the triggered build.", # NOQA
+        )
+        parser.add_argument(
+            '--branches',
+            help="The branch pattern defining which branches will include this step in their builds.", # NOQA
+            type=str,
+            nargs='+',
+            metavar="BRANCH_PATTERN"
+        )
+        parser.add_argument(
+            '--build-message',
+            help="The message for the build. Supports emoji.",
+            type=str,
+            metavar="MESSAGE")
+        parser.add_argument(
+            '--build-commit',
+            help="The commit hash for the build",
+            type=str,
+            metavar="SHA")
+        parser.add_argument(
+            '--build-branch',
+            help="The branch for the build",
+            type=str,
+            metavar="BRANCH")
+        parser.add_argument(
+            '--build-env',
+            help="A map of environment variables for the triggered build.",
+            type=str,
+            nargs=2,
+            action='append',
+            metavar=('KEY', 'VALUE')
+        )
+        parser.add_argument(
+            '--build-meta-data',
+            help="A map of meta-data for the triggered build.",
+            type=str,
+            nargs=2,
+            action='append',
+            metavar=('KEY', 'VALUE')
+        )
+        parser.set_defaults(func=Trigger.trigger)
+
+    @staticmethod
+    def trigger(namespace):
+        assert ns_hasattr(namespace, 'pipeline')
+        step = {
+            'trigger': namespace.pipeline
+        }
+
+        # label
+        if ns_hasattr(namespace, 'label'):
+            step['label'] = namespace.label
+        
+        # async
+        if ns_hasattr(namespace, 'async') and namespace.async:
+            step['async'] = True
+
+        # branches
+        if ns_hasattr(namespace, 'branches'):
+            step['branches'] = ' '.join(namespace.branches)
+
+        # build vars
+        has_build_branch = ns_hasattr(namespace, 'build_branch')
+        has_build_commit = ns_hasattr(namespace, 'build_commit')
+        has_build_message = ns_hasattr(namespace, 'build_message')
+        has_build_env = ns_hasattr(namespace, 'build_env')
+        has_build_meta_data = ns_hasattr(namespace, 'build_meta_data')
+        if has_build_branch \
+           or has_build_commit \
+           or has_build_message \
+           or has_build_env \
+           or has_build_meta_data:
+            build = step['build'] = {}
+
+            if has_build_branch:
+                build['branch'] = namespace.build_branch
+            if has_build_commit:
+                build['commit'] = namespace.build_commit
+            if has_build_message:
+                build['message'] = namespace.build_message
+            if has_build_env:
+                build['env'] = tuples_to_dict(namespace.build_env)
+            if has_build_meta_data:
+                build['meta_data'] = tuples_to_dict(namespace.build_meta_data)
+
+        YAML.indent(sequence=4, offset=2)
+        return YAML.to_string([step])
+
 class Plugin:
 
     @staticmethod
@@ -153,9 +260,9 @@ class Comment:
 
     @staticmethod
     def comment(namespace):
-        lines = "\n# ".join(namespace.str)
+        assert ns_hasattr(namespace, 'str')
+        lines = "\n# ".join([ "\n# ".join(line.splitlines()) for line in namespace.str])
         return f"# {lines}"
-
 
 class Steps:
 
@@ -523,6 +630,7 @@ def parse_args(args):
     Command.install(subparsers)
     Plugin.install(subparsers)
     Wait.install(subparsers)
+    Trigger.install(subparsers)
 
     parser.add_argument(
         '--version',

@@ -7,9 +7,6 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_comment 1'] = '''# a
-# b'''
-
 snapshots['test_help 1'] = '''usage:  comment [-h] COMMENT [COMMENT ...]
 
 positional arguments:
@@ -365,4 +362,84 @@ snapshots['test_wait 1'] = '''  - wait
 
 snapshots['test_wait_continue_on_failure 1'] = '''  - wait:
     continue_on_failure: true
+'''
+
+snapshots['test_comment 1'] = '''# a
+# b'''
+
+snapshots['test_comment_multiline 1'] = '''# multiline
+# comments
+# are fun'''
+
+snapshots['test_trigger_simple 1'] = '''  - trigger: my-pipeline
+'''
+
+snapshots['test_trigger_label 1'] = '''  - trigger: my-pipeline
+    label: ':rocket: Deploy'
+'''
+
+snapshots['test_help 7'] = '''usage:  trigger [-h] [--label LABEL] [--async]
+                [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
+                [--build-message MESSAGE] [--build-commit SHA]
+                [--build-branch BRANCH] [--build-env KEY VALUE]
+                [--build-meta-data KEY VALUE]
+                PIPELINE
+
+positional arguments:
+  PIPELINE              Name of the pipeline to trigger
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --label LABEL         The label that will be displayed in the pipeline
+                        visualisation in Buildkite. Supports emoji.
+  --async               If given, the step will immediately continue,
+                        regardless of the success of the triggered build.
+  --branches BRANCH_PATTERN [BRANCH_PATTERN ...]
+                        The branch pattern defining which branches will
+                        include this step in their builds.
+  --build-message MESSAGE
+                        The message for the build. Supports emoji.
+  --build-commit SHA    The commit hash for the build
+  --build-branch BRANCH
+                        The branch for the build
+  --build-env KEY VALUE
+                        A map of environment variables for the triggered
+                        build.
+  --build-meta-data KEY VALUE
+                        A map of meta-data for the triggered build.
+'''
+
+snapshots['test_trigger_async 1'] = '''  - trigger: my-pipeline
+    async: true
+'''
+
+snapshots['test_trigger_branches 1'] = '''  - trigger: my-pipeline
+    branches: master release-*
+'''
+
+snapshots['test_trigger_build_branch 1'] = '''  - trigger: my-pipeline
+    build:
+      branch: master
+'''
+
+snapshots['test_trigger_build_message 1'] = '''  - trigger: my-pipeline
+    build:
+      message: Put the lime in the coconut
+'''
+
+snapshots['test_trigger_build_commit 1'] = '''  - trigger: my-pipeline
+    build:
+      commit: c0ffee
+'''
+
+snapshots['test_trigger_build_env 1'] = '''  - trigger: my-pipeline
+    build:
+      env:
+        a: b
+'''
+
+snapshots['test_trigger_build_meta_data 1'] = '''  - trigger: my-pipeline
+    build:
+      meta_data:
+        a: b
 '''
