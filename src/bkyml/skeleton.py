@@ -167,7 +167,7 @@ class Steps:
     @staticmethod
     # pylint: disable=unused-argument
     def steps(namespace):
-        return YAML.to_string({ 'steps': None })
+        return YAML.to_string({'steps': None})
 
 
 class Env:
@@ -499,6 +499,7 @@ class Wait:
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
+
 
 def parse_args(args):
     """Parse command line parameters
