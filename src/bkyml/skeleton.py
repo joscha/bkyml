@@ -98,6 +98,28 @@ def plugins_section(step, namespace):
     return None
 
 
+class Block:
+
+    @staticmethod
+    def install(action):
+        parser = action.add_parser('block')
+        parser.add_argument(
+            dest="label",
+            help="Label of the block step. Supports emoji.",
+            type=str,
+            metavar="LABEL")
+        parser.set_defaults(func=Block.block)
+
+    @staticmethod
+    def block(namespace):
+        assert ns_hasattr(namespace, 'label')
+        step = {
+            'block': namespace.label
+        }
+        YAML.indent(sequence=4, offset=2)
+        return YAML.to_string([step])
+
+
 class Trigger:
 
     @staticmethod
@@ -631,6 +653,7 @@ def parse_args(args):
     Plugin.install(subparsers)
     Wait.install(subparsers)
     Trigger.install(subparsers)
+    Block.install(subparsers)
 
     parser.add_argument(
         '--version',

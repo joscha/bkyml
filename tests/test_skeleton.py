@@ -7,7 +7,8 @@ import argparse
 import sys
 from unittest.mock import patch
 import pytest
-from bkyml.skeleton import Comment, \
+from bkyml.skeleton import Block, \
+                           Comment, \
                            Steps, \
                            Env, \
                            Command, \
@@ -94,6 +95,19 @@ def describe_bkyaml():
             args.var = [['a', 'b'], ['c', 'd']]
             snapshot.assert_match(Env.env(args))
 
+    def describe_block():
+        @pytest.fixture
+        def generic_block_call(args, snapshot):
+            args.label = ':rocket: Release'
+            snapshot.assert_match(Block.block(args))
+
+        def test_block_missing(args, snapshot):
+            with pytest.raises(AssertionError):
+                Block.block(args)
+
+        def test_block_simple(args, snapshot):
+            generic_block_call(args, snapshot)
+
     def describe_trigger():
         @pytest.fixture
         def generic_trigger_call(args, snapshot):
@@ -102,7 +116,7 @@ def describe_bkyaml():
 
         def test_trigger_missing(args, snapshot):
             with pytest.raises(AssertionError):
-                snapshot.assert_match(Trigger.trigger(args))
+                Trigger.trigger(args)
 
         def test_trigger_simple(args, snapshot):
             generic_trigger_call(args, snapshot)
@@ -466,7 +480,7 @@ def describe_bkyaml():
             snapshot.assert_match(captured.err)
 
         def test_help(snapshot, capsys):
-            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait', 'trigger']:
+            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait', 'trigger', 'block']:
                 with pytest.raises(SystemExit):
                     with patch.object(sys, 'argv', ['', subcommand, '--help']):
                         run()

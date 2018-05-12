@@ -459,3 +459,15 @@ subcommands:
   {comment,steps,env,command,plugin,wait,trigger,block}
                         additional help
 '''
+
+snapshots['test_help 8'] = '''usage:  block [-h] LABEL
+
+positional arguments:
+  LABEL       Label of the block step. Supports emoji.
+
+optional arguments:
+  -h, --help  show this help message and exit
+'''
+
+snapshots['test_block_simple 1'] = '''  - block: ':rocket: Release'
+'''

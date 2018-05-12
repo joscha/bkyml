@@ -293,3 +293,18 @@ will result in
         FORCE_COLOR: '1'
       meta_data:
         release-name: 1.0.0
+
+block
+-----
+
+Example:
+
+.. code:: shell
+
+  bkyaml block ':rocket: Release'
+
+will result in
+
+.. code:: yaml
+
+  - block: ':rocket: Release'
