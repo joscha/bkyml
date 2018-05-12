@@ -142,6 +142,35 @@ def describe_bkyaml():
             args.field_text = [['key', 'label', 'hint', 'true', 'default']]
             generic_block_call(args, snapshot)
 
+        def test_block_field_select(args, snapshot):
+            args.field_select = [['key', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            generic_block_call(args, snapshot)
+
+        def test_block_field_select_no_key(args, snapshot):
+            args.field_select = [['', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            with pytest.raises(argparse.ArgumentTypeError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_select_no_label(args, snapshot):
+            args.field_select = [['key', '', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            with pytest.raises(argparse.ArgumentTypeError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_select_no_key_value(args, snapshot):
+            args.field_select = [['key', 'label', 'hint', 'false', 'default']]
+            with pytest.raises(argparse.ArgumentTypeError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_select_key_value_no_pair(args, snapshot):
+            args.field_select = [['key', 'label', 'hint', 'false', 'default', 'opt']]
+            with pytest.raises(ValueError):
+                generic_block_call(args, snapshot)
+
+        def test_block_field_multi_fields(args, snapshot):
+            args.field_text = [['key', 'label', 'hint', 'false', 'default']]
+            args.field_select = [['key', 'label', 'hint', 'false', 'default', 'opt1=Label1', 'opt2=Label2']]
+            generic_block_call(args, snapshot)
+
     def describe_trigger():
         @pytest.fixture
         def generic_trigger_call(args, snapshot):

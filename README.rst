@@ -308,3 +308,58 @@ will result in
 .. code:: yaml
 
   - block: ':rocket: Release'
+
+Example with a select field:
+
+.. code:: shell
+
+  bkyaml block ':rocket: Release!' \
+      --field-select \
+          'key' \
+          'Field label' \
+          'Some hint' \
+          true \
+          a \
+          'a=A label' \
+          'b=B label'
+
+will result in:
+
+..code:: yaml
+
+  - block: ':rocket: Release!'
+    fields:
+      - text: Field label
+        key: key
+        hint: Some hint
+        required: true
+        default: a
+        options:
+          - label: A label
+            value: a
+          - label: B label
+            value: b
+
+Example with a text field:
+
+.. code:: shell
+
+  bkyaml block ':rocket: Release!' \
+      --field-text \
+          'release-name' \
+          'Release name' \
+          'What should the next release name be?' \
+          true \
+          'Some release name'
+
+will result in:
+
+..code:: yaml
+
+  - block: ':rocket: Release!'
+    fields:
+      - text: Release name
+        key: release-name
+        hint: What should the next release name be?
+        required: true
+        default: Some release name

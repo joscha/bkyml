@@ -134,6 +134,21 @@ class Block:
             action='append',
             metavar=('KEY', 'LABEL', 'HINT', 'REQUIRED', 'DEFAULT')
         )
+        parser.add_argument(
+            '--field-select',
+            help="A select field. \
+                KEY is the meta-data key that stores the field's input. \
+                LABEL is the label of the field. \
+                HINT is the explanatory text that is shown after the label.\
+                REQUIRED (true/false) A boolean value that defines whether the field is required for form submission. \
+                DEFAULT is value that is pre-selected. \
+                KEY_VALUE_PAIRS is value that is pre-selected. \
+                ", # NOQA
+            type=str,
+            nargs='+', # TODO: This will produce an incorrect help entry
+            action='append',
+            metavar='KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...]'
+        )
         parser.set_defaults(func=Block.block)
 
     @staticmethod
@@ -160,25 +175,45 @@ class Block:
             if has_text_fields:
                 for text_field in namespace.field_text:
                     [key, label, hint, required, default] = text_field
-                    if key is None or key.strip() == '':
-                        raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
-                    if label is None or label.strip() == '':
-                        raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
-                    field = {
-                        'text': label,
-                        'key': key
-                    }
-                    if hint:
-                        field['hint'] = hint
-                    if required.lower() == 'true':
-                        field['required'] = True
-                    if default:
-                        field['default'] = default
+                    field = Block.gen_field('text', key, label, hint, required, default)
+                    fields.append(field)
+            if has_select_fields:
+                for select_field in namespace.field_select:
+                    if len(select_field) < 6:
+                         raise argparse.ArgumentTypeError("Missing required parameters")
+                    key, label, hint, required, default = select_field[0], select_field[1], select_field[2], select_field[3], select_field[4]
+                    pairs = select_field[5:]
+                    field = Block.gen_field('select', key, label, hint, required, default)
+
+                    options = field['options'] = []
+                    for pair in pairs:
+                        [value, label] = pair.split('=', 1)
+                        options.append({
+                            'label': label,
+                            'value': value,
+                        })
                     fields.append(field)
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
 
+    @staticmethod
+    def gen_field(type, key, label, hint, required, default):
+        if key is None or key.strip() == '':
+            raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
+        if label is None or label.strip() == '':
+            raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
+        field = {
+            type: label,
+            'key': key
+        }
+        if hint:
+            field['hint'] = hint
+        if required.lower() == 'true':
+            field['required'] = True
+        if default:
+            field['default'] = default
+        return field
 
 class Trigger:
 

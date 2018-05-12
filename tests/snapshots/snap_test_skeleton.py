@@ -459,6 +459,9 @@ subcommands:
 snapshots['test_help 8'] = '''usage:  block [-h] [--prompt PROMPT]
               [--branches BRANCH_PATTERN [BRANCH_PATTERN ...]]
               [--field-text KEY LABEL HINT REQUIRED DEFAULT]
+              [--field-select KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...]
+              [KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...]
+              ...]]
               LABEL
 
 positional arguments:
@@ -478,6 +481,14 @@ optional arguments:
                         REQUIRED (true/false) A boolean value that defines
                         whether the field is required for form submission.
                         DEFAULT is value that is pre-filled in the text field.
+  --field-select KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...] [KEY LABEL HINT REQUIRED DEFAULT KEY_VALUE_PAIRS [KEY_VALUE_PAIRS ...] ...]
+                        A select field. KEY is the meta-data key that stores
+                        the field's input. LABEL is the label of the field.
+                        HINT is the explanatory text that is shown after the
+                        label. REQUIRED (true/false) A boolean value that
+                        defines whether the field is required for form
+                        submission. DEFAULT is value that is pre-selected.
+                        KEY_VALUE_PAIRS is value that is pre-selected.
 '''
 
 snapshots['test_block_simple 1'] = '''  - block: ':rocket: Release'
@@ -524,4 +535,34 @@ snapshots['test_block_field_text_no_default 1'] = '''  - block: ':rocket: Releas
       - text: label
         key: key
         hint: hint
+'''
+
+snapshots['test_block_field_select 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - select: label
+        key: key
+        hint: hint
+        default: default
+        options:
+          - label: Label1
+            value: opt1
+          - label: Label2
+            value: opt2
+'''
+
+snapshots['test_block_field_multi_fields 1'] = '''  - block: ':rocket: Release'
+    fields:
+      - text: label
+        key: key
+        hint: hint
+        default: default
+      - select: label
+        key: key
+        hint: hint
+        default: default
+        options:
+          - label: Label1
+            value: opt1
+          - label: Label2
+            value: opt2
 '''
