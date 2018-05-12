@@ -108,10 +108,6 @@ optional arguments:
 snapshots['test_steps 1'] = '''steps:
 '''
 
-snapshots['test_command 1'] = '''  - command: x
-
-'''
-
 snapshots['test_main 1'] = '''  - command: x
 '''
 
@@ -470,4 +466,8 @@ optional arguments:
 '''
 
 snapshots['test_block_simple 1'] = '''  - block: ':rocket: Release'
+'''
+
+snapshots['test_cli_command 1'] = '''  - command: x
+
 '''

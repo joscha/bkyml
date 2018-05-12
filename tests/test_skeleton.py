@@ -469,7 +469,7 @@ def describe_bkyaml():
             snapshot.assert_match(parse_main(['command', '--command', 'x']))
 
     def describe_cli():
-        def test_command(snapshot, capsys):
+        def test_cli_command(snapshot, capsys):
             run_run(capsys, snapshot, ['command', '--command', 'x'])
 
         def test_empty_command(snapshot, capsys):
@@ -480,7 +480,16 @@ def describe_bkyaml():
             snapshot.assert_match(captured.err)
 
         def test_help(snapshot, capsys):
-            for subcommand in ['comment', 'steps', 'env', 'command', 'plugin', 'wait', 'trigger', 'block']:
+            for subcommand in [
+                'comment',
+                'steps',
+                'env',
+                'command',
+                'plugin',
+                'wait',
+                'trigger',
+                'block'
+            ]:
                 with pytest.raises(SystemExit):
                     with patch.object(sys, 'argv', ['', subcommand, '--help']):
                         run()

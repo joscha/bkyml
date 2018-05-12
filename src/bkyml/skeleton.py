@@ -191,7 +191,7 @@ class Trigger:
         # label
         if ns_hasattr(namespace, 'label'):
             step['label'] = namespace.label
-        
+
         # async
         if ns_hasattr(namespace, 'async') and namespace.async:
             step['async'] = True
@@ -226,6 +226,7 @@ class Trigger:
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
+
 
 class Plugin:
 
@@ -283,8 +284,9 @@ class Comment:
     @staticmethod
     def comment(namespace):
         assert ns_hasattr(namespace, 'str')
-        lines = "\n# ".join([ "\n# ".join(line.splitlines()) for line in namespace.str])
+        lines = "\n# ".join(["\n# ".join(line.splitlines()) for line in namespace.str])
         return f"# {lines}"
+
 
 class Steps:
 
@@ -697,9 +699,7 @@ def setup_logging(loglevel):
 def parse_main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
-    if hasattr(args, 'func'):
-        return args.func(args)
-    return None
+    return args.func(args)
 
 
 def main(args):
@@ -708,10 +708,8 @@ def main(args):
     Args:
       args ([str]): command line parameter list
     """
-    ret = parse_main(args)
     LOGGER.debug("Calling function")
-    if ret is not None:
-        print(ret)
+    print(parse_main(args))
     LOGGER.info("Script ends here")
 
 
