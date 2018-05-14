@@ -11,6 +11,7 @@ import sys
 import logging
 from ruamel.yaml import YAML as RuamelYaml
 from ruamel.yaml.compat import StringIO
+from ruamel.yaml.comments import CommentedMap
 
 from bkyml import __version__
 
@@ -72,6 +73,13 @@ def ns_hasattr(namespace, attr):
     return hasattr(namespace, attr) and getattr(namespace, attr) is not None
 
 
+def tuples_to_dict(tuples):
+    ret = CommentedMap()
+    for tpl in tuples:
+        ret[tpl[0]] = tpl[1]
+    return ret
+
+
 def singlify(a_list):
     if len(a_list) == 1:
         return a_list[0]
@@ -80,13 +88,13 @@ def singlify(a_list):
 
 def plugins_section(step, namespace):
     if ns_hasattr(namespace, 'plugin') and namespace.plugin:
-        plugins = {}
+        plugins = CommentedMap()
 
         for plugin in namespace.plugin:
             name, tuples = plugin[0], plugin[1:]
             plugins[name] = None
             if tuples:
-                plugins[name] = dict(tuples)
+                plugins[name] = tuples_to_dict(tuples)
         return plugins
     return None
 
@@ -147,9 +155,9 @@ class Block:
     @staticmethod
     def block(namespace):
         assert ns_hasattr(namespace, 'label')
-        step = {
+        step = CommentedMap({
             'block': namespace.label
-        }
+        })
 
         # prompt
         if ns_hasattr(namespace, 'prompt'):
@@ -185,10 +193,10 @@ class Block:
                     options = field['options'] = []
                     for pair in pairs:
                         [value, label] = pair.split('=', 1)
-                        options.append({
-                            'label': label,
-                            'value': value,
-                        })
+                        p = CommentedMap()
+                        p['label'] = label
+                        p['value'] = value
+                        options.append(p)
                     fields.append(field)
 
         YAML.indent(sequence=4, offset=2)
@@ -200,10 +208,10 @@ class Block:
             raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
         if label is None or label.strip() == '':
             raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
-        field = {
-            type: label,
-            'key': key
-        }
+        field = CommentedMap()
+        field[type] = label
+        field['key'] = key
+
         if hint:
             field['hint'] = hint
         if required.lower() == 'true':
@@ -277,9 +285,9 @@ class Trigger:
     @staticmethod
     def trigger(namespace):
         assert ns_hasattr(namespace, 'pipeline')
-        step = {
+        step = CommentedMap({
             'trigger': namespace.pipeline
-        }
+        })
 
         # label
         if ns_hasattr(namespace, 'label'):
@@ -304,7 +312,7 @@ class Trigger:
            or has_build_message \
            or has_build_env \
            or has_build_meta_data:
-            build = step['build'] = {}
+            build = step['build'] = CommentedMap()
 
             if has_build_branch:
                 build['branch'] = namespace.build_branch
@@ -313,9 +321,9 @@ class Trigger:
             if has_build_message:
                 build['message'] = namespace.build_message
             if has_build_env:
-                build['env'] = dict(namespace.build_env)
+                build['env'] = tuples_to_dict(namespace.build_env)
             if has_build_meta_data:
-                build['meta_data'] = dict(namespace.build_meta_data)
+                build['meta_data'] = tuples_to_dict(namespace.build_meta_data)
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
@@ -346,7 +354,7 @@ class Plugin:
 
     @staticmethod
     def plugin(namespace):
-        step = {}
+        step = CommentedMap()
 
         if ns_hasattr(namespace, 'name') and namespace.name:
             step['name'] = namespace.name
@@ -413,7 +421,7 @@ class Env:
     @staticmethod
     def env(namespace):
         return YAML.to_string({
-            'env': dict(namespace.var),
+            'env': tuples_to_dict(namespace.var),
         })
 
 
@@ -605,7 +613,7 @@ class Command:
 
     @staticmethod
     def command(namespace):
-        step = {}
+        step = CommentedMap()
 
         # label
         if ns_hasattr(namespace, 'label'):
@@ -623,11 +631,11 @@ class Command:
 
         # env
         if ns_hasattr(namespace, 'env'):
-            step['env'] = dict(namespace.env)
+            step['env'] = tuples_to_dict(namespace.env)
 
         # agents
         if ns_hasattr(namespace, 'agents'):
-            step['agents'] = dict(namespace.agents)
+            step['agents'] = tuples_to_dict(namespace.agents)
 
         # artifact_paths
         if ns_hasattr(namespace, 'artifact_paths'):
@@ -658,8 +666,8 @@ class Command:
 
         # retry
         if ns_hasattr(namespace, 'retry'):
-            retry = {}
-            retry[namespace.retry] = {}
+            retry = CommentedMap()
+            retry[namespace.retry] = CommentedMap()
 
             if namespace.retry == 'automatic':
                 if ns_hasattr(namespace, 'retry_automatic_exit_status'):
@@ -670,10 +678,10 @@ class Command:
                     if namespace.retry_automatic_tuple:
                         retry[namespace.retry] = []
                         for tpl in namespace.retry_automatic_tuple:
-                            retry[namespace.retry].append({
-                                'exit_status': int_or_star(tpl[0]),
-                                'limit': min(10, check_positive(tpl[1])),
-                            })
+                            t = CommentedMap()
+                            t['exit_status'] = int_or_star(tpl[0])
+                            t['limit'] = min(10, check_positive(tpl[1]))
+                            retry[namespace.retry].append(t)
             elif namespace.retry == 'manual':
                 if ns_hasattr(namespace, 'retry_manual_allowed') \
                    and not namespace.retry_manual_allowed:
@@ -688,6 +696,7 @@ class Command:
 
             if not retry[namespace.retry]:
                 retry[namespace.retry] = True
+
             step['retry'] = retry
 
         # plugins
@@ -716,10 +725,9 @@ class Wait:
         step = 'wait'
 
         if ns_hasattr(namespace, 'continue_on_failure') and namespace.continue_on_failure:
-            step = {
-                'wait': None,
-                'continue_on_failure': True,
-            }
+            step = CommentedMap()
+            step['wait'] = None
+            step['continue_on_failure'] = True
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
