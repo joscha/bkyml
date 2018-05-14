@@ -671,10 +671,10 @@ class Command:
                     if namespace.retry_automatic_tuple:
                         retry[namespace.retry] = []
                         for tpl in namespace.retry_automatic_tuple:
-                            retry[namespace.retry].append(CommentedMap({
-                                'exit_status': int_or_star(tpl[0]),
-                                'limit': min(10, check_positive(tpl[1])),
-                            }))
+                            t = CommentedMap()
+                            t['exit_status'] = int_or_star(tpl[0])
+                            t['limit'] = min(10, check_positive(tpl[1]))
+                            retry[namespace.retry].append(t)
             elif namespace.retry == 'manual':
                 if ns_hasattr(namespace, 'retry_manual_allowed') \
                    and not namespace.retry_manual_allowed:
