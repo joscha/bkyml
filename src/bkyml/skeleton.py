@@ -378,7 +378,7 @@ class Comment:
     def comment(namespace):
         assert ns_hasattr(namespace, 'str')
         lines = "\n# ".join(["\n# ".join(line.splitlines()) for line in namespace.str])
-        return f"# {lines}"
+        return "# {lines}".format(lines=lines)
 
 
 class Steps:
