@@ -201,10 +201,10 @@ class Block:
             raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
         if label is None or label.strip() == '':
             raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
-        field = CommentedMap({
-            type: label,
-            'key': key
-        })
+        field = CommentedMap()
+        field[type] = label
+        field['key'] = key
+
         if hint:
             field['hint'] = hint
         if required.lower() == 'true':
