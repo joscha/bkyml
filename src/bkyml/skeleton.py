@@ -75,7 +75,7 @@ def ns_hasattr(namespace, attr):
 
 
 def tuples_to_dict(tuples):
-    ret = {}
+    ret = CommentedMap()
     for tpl in tuples:
         ret[tpl[0]] = tpl[1]
     return ret
