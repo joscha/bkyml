@@ -9,6 +9,7 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import sys
 import logging
+from collections import OrderedDict
 from ruamel.yaml import YAML as RuamelYaml
 from ruamel.yaml.compat import StringIO
 from ruamel.yaml.comments import CommentedMap
@@ -87,7 +88,7 @@ def plugins_section(step, namespace):
             name, tuples = plugin[0], plugin[1:]
             plugins[name] = None
             if tuples:
-                plugins[name] = CommentedMap(dict(tuples))
+                plugins[name] = CommentedMap(OrderedDict(dict(tuples)))
         return plugins
     return None
 
@@ -186,10 +187,10 @@ class Block:
                     options = field['options'] = []
                     for pair in pairs:
                         [value, label] = pair.split('=', 1)
-                        options.append({
-                            'label': label,
-                            'value': value,
-                        })
+                        p = CommentedMap()
+                        p['label'] = label
+                        p['value'] = value
+                        options.append(p)
                     fields.append(field)
 
         YAML.indent(sequence=4, offset=2)
@@ -314,9 +315,9 @@ class Trigger:
             if has_build_message:
                 build['message'] = namespace.build_message
             if has_build_env:
-                build['env'] = CommentedMap(dict(namespace.build_env))
+                build['env'] = CommentedMap(OrderedDict(dict(namespace.build_env)))
             if has_build_meta_data:
-                build['meta_data'] = CommentedMap(dict(namespace.build_meta_data))
+                build['meta_data'] = CommentedMap(OrderedDict(dict(namespace.build_meta_data)))
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
@@ -414,7 +415,7 @@ class Env:
     @staticmethod
     def env(namespace):
         return YAML.to_string({
-            'env': CommentedMap(dict(namespace.var)),
+            'env': CommentedMap(OrderedDict(dict(namespace.var))),
         })
 
 
@@ -624,11 +625,11 @@ class Command:
 
         # env
         if ns_hasattr(namespace, 'env'):
-            step['env'] = CommentedMap(dict(namespace.env))
+            step['env'] = CommentedMap(OrderedDict(dict(namespace.env)))
 
         # agents
         if ns_hasattr(namespace, 'agents'):
-            step['agents'] = CommentedMap(dict(namespace.agents))
+            step['agents'] = CommentedMap(OrderedDict(dict(namespace.agents)))
 
         # artifact_paths
         if ns_hasattr(namespace, 'artifact_paths'):
