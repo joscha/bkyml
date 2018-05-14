@@ -321,7 +321,7 @@ Example with a select field:
 
 will result in:
 
-..code:: yaml
+.. code:: yaml
 
   - block: ':rocket: Release!'
     fields:
@@ -350,7 +350,7 @@ Example with a text field:
 
 will result in:
 
-..code:: yaml
+.. code:: yaml
 
   - block: ':rocket: Release!'
     fields:
