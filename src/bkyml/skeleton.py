@@ -88,7 +88,7 @@ def plugins_section(step, namespace):
             name, tuples = plugin[0], plugin[1:]
             plugins[name] = None
             if tuples:
-                plugins[name] = CommentedMap(OrderedDict(dict(tuples)))
+                plugins[name] = tuples_to_dict(tuples)
         return plugins
     return None
 
@@ -315,9 +315,9 @@ class Trigger:
             if has_build_message:
                 build['message'] = namespace.build_message
             if has_build_env:
-                build['env'] = CommentedMap(OrderedDict(dict(namespace.build_env)))
+                build['env'] = tuples_to_dict(namespace.build_env)
             if has_build_meta_data:
-                build['meta_data'] = CommentedMap(OrderedDict(dict(namespace.build_meta_data)))
+                build['meta_data'] = tuples_to_dict(namespace.build_meta_data)
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
@@ -415,7 +415,7 @@ class Env:
     @staticmethod
     def env(namespace):
         return YAML.to_string({
-            'env': CommentedMap(OrderedDict(dict(namespace.var))),
+            'env': tuples_to_dict(namespace.var),
         })
 
 
@@ -625,11 +625,11 @@ class Command:
 
         # env
         if ns_hasattr(namespace, 'env'):
-            step['env'] = CommentedMap(OrderedDict(dict(namespace.env)))
+            step['env'] = tuples_to_dict(namespace.env)
 
         # agents
         if ns_hasattr(namespace, 'agents'):
-            step['agents'] = CommentedMap(OrderedDict(dict(namespace.agents)))
+            step['agents'] = tuples_to_dict(namespace.agents)
 
         # artifact_paths
         if ns_hasattr(namespace, 'artifact_paths'):
