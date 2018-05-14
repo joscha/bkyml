@@ -220,8 +220,8 @@ snapshots['test_env 1'] = '''  - command: cmd
 
 snapshots['test_agents 1'] = '''  - command: cmd
     agents:
-      npm: 'true'
       mvn: 'true'
+      npm: 'true'
 '''
 
 snapshots['test_artifact_paths_0 1'] = '''  - command: cmd
