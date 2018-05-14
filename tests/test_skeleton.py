@@ -283,7 +283,7 @@ def describe_bkyaml():
             generic_command_call(args, snapshot)
 
         def test_agents(args, snapshot):
-            args.agents = [['mvn', 'true'], ['npm', 'true']]
+            args.agents = [['npm', 'true'], ['mvn', 'true']]
             generic_command_call(args, snapshot)
 
         def test_artifact_paths_0(args, snapshot):
