@@ -9,7 +9,6 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import sys
 import logging
-from collections import OrderedDict
 from ruamel.yaml import YAML as RuamelYaml
 from ruamel.yaml.compat import StringIO
 from ruamel.yaml.comments import CommentedMap
@@ -726,10 +725,9 @@ class Wait:
         step = 'wait'
 
         if ns_hasattr(namespace, 'continue_on_failure') and namespace.continue_on_failure:
-            step = CommentedMap({
-                'wait': None,
-                'continue_on_failure': True,
-            })
+            step = CommentedMap()
+            step['wait'] = None
+            step['continue_on_failure'] = True
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
