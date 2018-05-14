@@ -9,9 +9,9 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import sys
 import logging
-from collections import OrderedDict
 from ruamel.yaml import YAML as RuamelYaml
 from ruamel.yaml.compat import StringIO
+from ruamel.yaml.comments import CommentedMap
 
 from bkyml import __version__
 
@@ -81,14 +81,14 @@ def singlify(a_list):
 
 def plugins_section(step, namespace):
     if ns_hasattr(namespace, 'plugin') and namespace.plugin:
-        plugins = OrderedDict()
+        plugins = CommentedMap()
 
         for plugin in namespace.plugin:
             name, tuples = plugin[0], plugin[1:]
             plugins[name] = None
             if tuples:
-                plugins[name] = dict(tuples)
-        return dict(plugins)
+                plugins[name] = CommentedMap(dict(tuples))
+        return plugins
     return None
 
 
@@ -148,7 +148,7 @@ class Block:
     @staticmethod
     def block(namespace):
         assert ns_hasattr(namespace, 'label')
-        step = OrderedDict({
+        step = CommentedMap({
             'block': namespace.label
         })
 
@@ -193,7 +193,7 @@ class Block:
                     fields.append(field)
 
         YAML.indent(sequence=4, offset=2)
-        return YAML.to_string([dict(step)])
+        return YAML.to_string([step])
 
     @staticmethod
     def gen_field(type, key, label, hint, required, default):
@@ -201,7 +201,7 @@ class Block:
             raise argparse.ArgumentTypeError("'%s' is an invalid key" % key)
         if label is None or label.strip() == '':
             raise argparse.ArgumentTypeError("'%s' is an invalid label" % label)
-        field = OrderedDict({
+        field = CommentedMap({
             type: label,
             'key': key
         })
@@ -211,7 +211,7 @@ class Block:
             field['required'] = True
         if default:
             field['default'] = default
-        return dict(field)
+        return field
 
 
 class Trigger:
@@ -278,7 +278,7 @@ class Trigger:
     @staticmethod
     def trigger(namespace):
         assert ns_hasattr(namespace, 'pipeline')
-        step = OrderedDict({
+        step = CommentedMap({
             'trigger': namespace.pipeline
         })
 
@@ -305,7 +305,7 @@ class Trigger:
            or has_build_message \
            or has_build_env \
            or has_build_meta_data:
-            build = step['build'] = OrderedDict()
+            build = step['build'] = CommentedMap()
 
             if has_build_branch:
                 build['branch'] = namespace.build_branch
@@ -314,14 +314,12 @@ class Trigger:
             if has_build_message:
                 build['message'] = namespace.build_message
             if has_build_env:
-                build['env'] = dict(namespace.build_env)
+                build['env'] = CommentedMap(dict(namespace.build_env))
             if has_build_meta_data:
-                build['meta_data'] = dict(namespace.build_meta_data)
-
-            step['build'] = dict(build)
+                build['meta_data'] = CommentedMap(dict(namespace.build_meta_data))
 
         YAML.indent(sequence=4, offset=2)
-        return YAML.to_string([dict(step)])
+        return YAML.to_string([step])
 
 
 class Plugin:
@@ -349,7 +347,7 @@ class Plugin:
 
     @staticmethod
     def plugin(namespace):
-        step = OrderedDict()
+        step = CommentedMap()
 
         if ns_hasattr(namespace, 'name') and namespace.name:
             step['name'] = namespace.name
@@ -361,7 +359,7 @@ class Plugin:
             return ''
 
         YAML.indent(sequence=4, offset=2)
-        return YAML.to_string([dict(step)])
+        return YAML.to_string([step])
 
 
 class Comment:
@@ -416,7 +414,7 @@ class Env:
     @staticmethod
     def env(namespace):
         return YAML.to_string({
-            'env': dict(namespace.var),
+            'env': CommentedMap(dict(namespace.var)),
         })
 
 
@@ -608,7 +606,7 @@ class Command:
 
     @staticmethod
     def command(namespace):
-        step = OrderedDict()
+        step = CommentedMap()
 
         # label
         if ns_hasattr(namespace, 'label'):
@@ -626,11 +624,11 @@ class Command:
 
         # env
         if ns_hasattr(namespace, 'env'):
-            step['env'] = dict(namespace.env)
+            step['env'] = CommentedMap(dict(namespace.env))
 
         # agents
         if ns_hasattr(namespace, 'agents'):
-            step['agents'] = dict(namespace.agents)
+            step['agents'] = CommentedMap(dict(namespace.agents))
 
         # artifact_paths
         if ns_hasattr(namespace, 'artifact_paths'):
@@ -661,8 +659,8 @@ class Command:
 
         # retry
         if ns_hasattr(namespace, 'retry'):
-            retry = OrderedDict()
-            retry[namespace.retry] = OrderedDict()
+            retry = CommentedMap()
+            retry[namespace.retry] = CommentedMap()
 
             if namespace.retry == 'automatic':
                 if ns_hasattr(namespace, 'retry_automatic_exit_status'):
@@ -673,10 +671,10 @@ class Command:
                     if namespace.retry_automatic_tuple:
                         retry[namespace.retry] = []
                         for tpl in namespace.retry_automatic_tuple:
-                            retry[namespace.retry].append(dict(OrderedDict({
+                            retry[namespace.retry].append(CommentedMap({
                                 'exit_status': int_or_star(tpl[0]),
                                 'limit': min(10, check_positive(tpl[1])),
-                            })))
+                            }))
             elif namespace.retry == 'manual':
                 if ns_hasattr(namespace, 'retry_manual_allowed') \
                    and not namespace.retry_manual_allowed:
@@ -691,10 +689,8 @@ class Command:
 
             if not retry[namespace.retry]:
                 retry[namespace.retry] = True
-            elif not isinstance(retry[namespace.retry], list):
-                retry[namespace.retry] = dict(retry[namespace.retry])
 
-            step['retry'] = dict(retry)
+            step['retry'] = retry
 
         # plugins
         plugins = plugins_section(step, namespace)
@@ -702,7 +698,7 @@ class Command:
             step['plugins'] = plugins
 
         YAML.indent(sequence=4, offset=2)
-        return YAML.to_string([dict(step)])
+        return YAML.to_string([step])
 
 
 class Wait:
@@ -722,11 +718,10 @@ class Wait:
         step = 'wait'
 
         if ns_hasattr(namespace, 'continue_on_failure') and namespace.continue_on_failure:
-            step = OrderedDict({
+            step = CommentedMap({
                 'wait': None,
                 'continue_on_failure': True,
             })
-            step = dict(step)
 
         YAML.indent(sequence=4, offset=2)
         return YAML.to_string([step])
