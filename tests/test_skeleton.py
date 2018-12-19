@@ -221,7 +221,7 @@ def describe_bkyaml():
             generic_trigger_call(args, snapshot)
 
         def test_trigger_async(args, snapshot):
-            args.async = True
+            args.is_async = True
             generic_trigger_call(args, snapshot)
 
         def test_trigger_branches(args, snapshot):

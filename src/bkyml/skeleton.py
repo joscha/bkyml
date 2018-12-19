@@ -239,6 +239,7 @@ class Trigger:
             metavar="LABEL")
         parser.add_argument(
             '--async',
+            dest="is_async",
             action='store_true',
             help="If given, the step will immediately continue, regardless of the success of the triggered build.", # NOQA
         )
@@ -294,7 +295,7 @@ class Trigger:
             step['label'] = namespace.label
 
         # async
-        if ns_hasattr(namespace, 'async') and namespace.async:
+        if ns_hasattr(namespace, 'is_async') and namespace.is_async:
             step['async'] = True
 
         # branches
