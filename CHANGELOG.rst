@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 1.4.2
+Version 1.4.3
 =============
 
 - fix use of ``async`` keyword with Python 3.7
