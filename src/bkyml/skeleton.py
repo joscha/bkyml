@@ -507,6 +507,12 @@ class Command:
             metavar="BOOL_OR_STRING"
         )
         parser.add_argument(
+            '--soft-fail',
+            help="Allow specified non-zero exit statuses not to fail the build.",
+            type=int_or_star,
+            metavar='INT_OR_STAR'
+        )
+        parser.add_argument(
             '--retry',
             help="The conditions for retrying this step.",
             choices=['automatic', 'manual']
@@ -699,6 +705,13 @@ class Command:
                 retry[namespace.retry] = True
 
             step['retry'] = retry
+
+        # soft_fail
+        if ns_hasattr(namespace, 'soft_fail'):
+            if namespace.soft_fail == '*':
+                step['soft_fail'] = True
+            else:
+                step['soft_fail'] = { 'exit_status': namespace.soft_fail }
 
         # plugins
         plugins = plugins_section(step, namespace)
