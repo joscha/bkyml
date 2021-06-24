@@ -504,6 +504,7 @@ def describe_bkyaml():
             args.soft_fail = '*'
             generic_command_call(args, snapshot)
 
+
         def test_soft_fail_1(args, snapshot):
             args.soft_fail = 1
             generic_command_call(args, snapshot)
