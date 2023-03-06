@@ -36,7 +36,7 @@ snapshots['test_help 4'] = '''usage:  command [-h] --command COMMAND [COMMAND ..
                 [--parallelism POSITIVE_NUMBER] [--concurrency POSITIVE_INT]
                 [--concurrency-group GROUP_NAME]
                 [--timeout-in-minutes TIMEOUT] [--skip BOOL_OR_STRING]
-                [--retry {automatic,manual}]
+                [--soft-fail INT_OR_STAR] [--retry {automatic,manual}]
                 [--retry-automatic-exit-status INT_OR_STAR]
                 [--retry-automatic-limit POSITIVE_INT]
                 [--retry-automatic-tuple INT_OR_STAR POSITIVE_INT]
@@ -78,6 +78,9 @@ optional arguments:
                         build will fail.
   --skip BOOL_OR_STRING
                         Whether to skip this step or not.
+  --soft-fail INT_OR_STAR
+                        Allow specified non-zero exit statuses not to fail the
+                        build.
   --retry {automatic,manual}
                         The conditions for retrying this step.
   --retry-automatic-exit-status INT_OR_STAR
@@ -268,6 +271,15 @@ snapshots['test_skip_bool_false 1'] = '''  - command: cmd
 
 snapshots['test_skip_string 1'] = '''  - command: cmd
     skip: Some reason
+'''
+
+snapshots['test_soft_fail 1'] = '''  - command: cmd
+    soft_fail: true
+'''
+
+snapshots['test_soft_fail_1 1'] = '''  - command: cmd
+    soft_fail:
+      exit_status: 1
 '''
 
 snapshots['test_env_all 1'] = '''env:
