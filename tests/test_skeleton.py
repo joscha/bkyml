@@ -342,6 +342,14 @@ def describe_bkyaml():
             args.skip = 'Some reason'
             generic_command_call(args, snapshot)
 
+        def test_soft_fail(args, snapshot):
+            args.soft_fail = '*'
+            generic_command_call(args, snapshot)
+
+        def test_soft_fail_1(args, snapshot):
+            args.soft_fail = 1
+            generic_command_call(args, snapshot)
+
         def describe_retry():
             def test_retry_unknown(args, snapshot):
                 args.retry = 'unknown'
